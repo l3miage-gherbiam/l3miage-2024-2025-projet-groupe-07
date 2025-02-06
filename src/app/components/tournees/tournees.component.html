@@ -1,0 +1,71 @@
+<table class="table custom-table">
+	<thead>
+	  <tr>
+		<th scope="col" (click)="sortBy('idTournee')">
+		  ID Tournée
+		  @if (sortColumn === 'idTournee') {
+			<span class="sort-indicator">
+			  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+			</span>
+		  }
+		</th>
+		<th scope="col" (click)="sortBy('jour')">
+		  Journée
+		  @if (sortColumn === 'jour') {
+			<span class="sort-indicator">
+			  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+			</span>
+		  }
+		</th>
+		<th scope="col" (click)="sortBy('equipe')">
+		  Équipe
+		  @if (sortColumn === 'equipe') {
+			<span class="sort-indicator">
+			  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+			</span>
+		  }
+		</th>
+		<th scope="col" (click)="sortBy('camion')">
+		  Camion
+		  @if (sortColumn === 'camion') {
+			<span class="sort-indicator">
+			  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+			</span>
+		  }
+		</th>
+		<th scope="col" (click)="sortBy('distanceAParcourir')">
+		  Distance (km)
+		  @if (sortColumn === 'distanceAParcourir') {
+			<span class="sort-indicator">
+			  {{ sortDirection === 'asc' ? '▲' : '▼' }}
+			</span>
+		  }
+		</th>
+		<th scope="col">
+		  commandes
+		</th>
+		<th scope="col">Actions</th>
+	  </tr>
+	</thead>
+	<tbody>
+	  @for (item of sortedTournees(); track item.idTournee) {
+		<tr>
+		  <td scope="row">{{ item.idTournee }}</td>
+		  <td>{{ item.jour }}</td>
+		  <td>{{ item.equipe?.id }}</td>
+		  <td>{{ item.camion }}</td>
+		  <td>{{ item.distanceAParcourir }}</td>
+		  <td>
+			<ul>
+			  @for (commande of item.commandes; track commande.id) {
+				<li>{{ commande.client.nom }} - {{ commande.client.adresse }}</li>
+			  }
+			</ul>
+		  </td>
+		  <td>
+			<button class="custom-action-btn modify">Modifier</button>
+		  </td>
+		</tr>
+	  }
+	</tbody>
+  </table>

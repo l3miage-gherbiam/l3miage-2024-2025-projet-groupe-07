@@ -1,0 +1,24 @@
+<header>
+    <div class="header-left">
+      <div>
+        <button routerLink="/tableau-de-bord">Tableau de bord</button>
+        <button routerLink="/livraisons">Livraisons</button>
+        <button routerLink="/gestion-dequipes">Gestion d'équipes</button>
+        <button routerLink="/tournees">Tournées</button>
+        <button routerLink="/planificateur">Planification</button>
+      </div>
+    </div>
+    <div class="header-right">
+      <img src="assets/images/notification.png" alt="Notification" class="notification" />
+      <div class="profile-dropdown">
+        <button class="profile-dropbtn"> &#9776;</button>
+        <div class="profile-dropdown-content">
+          <button>Mon Profile</button>
+          <button>Paramétres</button>
+          <button>Deconnexion</button>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+<router-outlet></router-outlet>

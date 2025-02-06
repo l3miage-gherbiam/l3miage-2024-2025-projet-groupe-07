@@ -1,0 +1,74 @@
+<div class="row main-container">
+  <div class="col-md-4 stats-section">
+    <div class="box">
+      <h1 class="section-title">Statistiques du jour</h1>
+      <div class="stats-details">
+        <div class="stat-item">
+          <span class="stat-label">Nombre de commandes :</span>
+          <span class="stat-value">{{ nombreDeCommandes() }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Commandes effectuées :</span>
+          <span class="stat-value">{{ commandesEffectuees() }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Commandes en cours :</span>
+          <span class="stat-value">{{ commandesEnCours() }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">En attente :</span>
+          <span class="stat-value">{{ commandesEnAttente() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 teams-section">
+    <div class="box">
+      <h1 class="section-title">Équipes Livreurs</h1>
+      <div class="teams-group">
+        <h3 class="sub-section-title">Actives</h3>
+        @for (item of dataService.equipeLivreurs(); track item.id) {
+          @if (item.status === dataService.StatusEquipeLivreurs.EnLivraison) {
+            <p class="team-item">
+              <span class="team-id">{{ item.id }}</span> :
+              <span class="team-names">{{ item.livreurs[0].prenom }} et {{ item.livreurs[1].prenom }}</span>
+            </p>
+          }
+        }
+      </div>
+      <div class="teams-group">
+        <h3 class="sub-section-title">Prêtes</h3>
+        @for (item of dataService.equipeLivreurs(); track item.id) {
+          @if (item.status === dataService.StatusEquipeLivreurs.Ready  ) {
+            <p class="team-item">
+              <span class="team-id">{{ item.id }}</span> :
+              <span class="team-names">{{ item.livreurs[0].prenom }} et {{ item.livreurs[1].prenom }}</span>
+            </p>
+          }
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 alerts-section">
+    <div class="box">
+      <h1 class="section-title">Alertes</h1>
+      <ul class="alert-list">
+        <li class="alert-item">
+          <strong>Attention :</strong> Une équipe a dépassé le délai prévu de commande.
+        </li>
+        <li class="alert-item">
+          <strong>Info :</strong> Nouvelle mise à jour de l'itinéraire disponible.
+        </li>
+        <li class="alert-item">
+          <strong>Urgent :</strong> Vérifiez l'état de la commande numéro 12.
+        </li>
+      </ul>
+      <div class="alert-summary">
+        <span class="alert-icon">⚠️</span>
+        <span class="alert-text">3 alertes actives</span>
+      </div>
+    </div>
+  </div>
+</div>

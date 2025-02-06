@@ -1,0 +1,14 @@
+<div class="container">
+	<h1>Connexion</h1>
+	<form (ngSubmit)="onSubmit()">
+	  <mat-form-field appearance="outline">
+		<mat-label>Email</mat-label>
+		<input matInput [(ngModel)]="email" name="email" required>
+	  </mat-form-field>
+	  <mat-form-field appearance="outline">
+		<mat-label>Password</mat-label>
+		<input matInput [(ngModel)]="password" name="password" type="password" required>
+	  </mat-form-field>
+	  <button mat-raised-button color="primary" (click)="onLogin()">se connecter</button>
+	</form>
+  </div>

@@ -1,0 +1,99 @@
+/* Personnalisation générale du tableau */
+.custom-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* En-tête du tableau */
+.custom-table thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.custom-table th {
+  padding: 0.75rem;
+  vertical-align: middle;
+  color: #495057;
+  font-weight: 600;
+  text-align: left;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Corps du tableau */
+.custom-table td {
+  padding: 0.75rem;
+  vertical-align: middle;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Zébrage et survol des lignes */
+.custom-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.custom-table tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+/* Bouton d'action personnalisé */
+.custom-action-btn {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.custom-action-btn.modify {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.custom-action-btn.modify:hover {
+  background-color: #0056b3;
+}
+
+/* Styles pour le statut */
+.custom-status {
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+/* Couleurs conditionnelles selon EtatLivraison */
+.custom-status-enCours {
+  color: #fd7e14;  /* orange */
+}
+
+.custom-status-planifiee {
+  color: #007bff;  /* bleu */
+}
+
+.custom-status-effectuee {
+  color: #28a745;  /* vert */
+}
+
+.custom-status-aPlanifier {
+  color: #6c757d;  /* gris */
+}
+
+
+.custom-table th {
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  padding-right: 1.5rem;
+}
+
+.custom-table th:hover {
+  background-color: #f1f1f1;
+}
+
+.sort-indicator {
+  font-size: 0.75rem;
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+}

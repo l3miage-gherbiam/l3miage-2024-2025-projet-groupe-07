@@ -1,0 +1,134 @@
+<div class="row">
+  <div cdkDropListGroup class="d-flex flex-row w-100">
+    <div class="col-sm-3">
+      <h1>Tournées</h1>
+      <button (click)="toggleEquipeDropdown()">+ Nouvelle Tournée</button>
+      @if (showEquipeDropdown()) {
+        <div class="dropdown-box">
+          <div class="dropdown-section">
+            <mat-form-field appearance="outline">
+              <mat-label>Choisir une date</mat-label>
+              <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+          </div>
+          
+          <div class="dropdown-section">
+            <label for="equipeSelect">Choisir une équipe:</label>
+            <select id="equipeSelect" [(ngModel)]="selectedEquipe">
+              @for (equipe of filteredEquipes(); track $index) {
+                <option [ngValue]="equipe">
+                  {{ equipe.id }} - {{ equipe.horaire }}
+                </option>
+              }
+            </select>
+          </div>
+          @if (selectedEquipe()) {
+            <div class="dropdown-section">
+              <h2>Commandes Assignées: {{ assignedCommandes().length }}</h2>
+              <button (click)="toggleCommandeDropdown()">Ajouter Commande</button>
+              @if (showCommandeDropdown()) {
+                <div class="dropdown-section">
+                  <input type="text" placeholder="Rechercher une commande" [(ngModel)]="searchTerm">
+                  <select id="commandeSelect" size="5">
+                    @for (commande of filteredCommandesForDropdown(); track $index) {
+                      <option (click)="assignCommande(commande)">
+                        ID: {{ commande.id }} - {{ commande.client.prenom }} {{ commande.client.nom }}
+                      </option>
+                    }
+                  </select>
+                </div>
+              }
+              <div class="assigned-commandes-box" cdkDropList id="cdk-drop-list-assignees"
+                   [cdkDropListData]="assignedCommandes()" (cdkDropListDropped)="drop($event)">
+                @if (assignedCommandes().length === 0) {
+                  <div class="commande-placeholder">
+                    Glissez une commande ici
+                  </div>
+                }
+                @for (commande of assignedCommandes(); track $index) {
+                  <div class="commande-box" cdkDrag [cdkDragData]="commande">
+                    <p>ID: {{ commande.id }}</p>
+                    <p>{{ commande.client.prenom }} {{ commande.client.nom }}</p>
+                    <p>{{ commande.client.adresse }}</p>
+                  </div>
+                }
+              </div>
+              @if (assignedCommandes().length > 0) {
+                <button (click)="confirmerTournee()">Valider</button>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @for (tournee of createdTournees(); track $index) {
+        <div class="tournee-box" (dblclick)="modifierTournee(tournee)" title="Double-cliquer pour modifier">
+          <h3>Tournée ID: {{ tournee.idTournee }}</h3>
+          <p>Équipe: {{ tournee.equipe?.id }}</p>
+          <h4>Commandes:</h4>
+          <ul>
+            @for (commande of tournee.commandes; track $index) {
+              <li>
+                ID: {{ commande.id }} - {{ commande.client.prenom }} {{ commande.client.nom }} - 
+                {{ commande.client.adresse }}
+              </li>
+            }
+          </ul>
+          <button class="optimiser-button" (click)="validerTournee(tournee)">Garder L'ordre</button>
+            <button class="optimiser-button" (click)="optimiserTournee(tournee)">Optimiser</button>
+        </div>
+      }
+      @if (selectedTournee()) {
+        <div class="editing-section">
+          <h3>Modifier Tournée</h3>
+          <div>
+            <label>Équipe:</label>
+            <select [(ngModel)]="selectedEquipe">
+              @for (equipe of filteredEquipes(); track $index) {
+                <option [ngValue]="equipe">{{ equipe.id }} - {{ equipe.horaire }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label>Commandes:</label>
+            <div class="assigned-commandes-box" cdkDropList id="cdk-drop-list-assignees-edit"
+                 [cdkDropListData]="assignedCommandes()" (cdkDropListDropped)="drop($event)">
+              @if (assignedCommandes().length === 0) {
+                <div class="commande-placeholder">
+                  Glissez une commande ici
+                </div>
+              }
+              @for (commande of assignedCommandes(); track $index) {
+                <div class="commande-box" cdkDrag [cdkDragData]="commande">
+                  <p>ID: {{ commande.id }}</p>
+                  <p>{{ commande.client.prenom }} {{ commande.client.nom }}</p>
+                  <p>{{ commande.client.adresse }}</p>
+                </div>
+              }
+            </div>
+          </div>
+          <button (click)="confirmerModification()">Confirmer Modification</button>
+        </div>
+      }
+    </div>
+    <div class="col-sm-6">
+      <app-map [destinationsGeoCode]="destinationsGeoCode()" [itenairaire]="itenairaire()" [cheminOptimise]="cheminOptimiseSignal()"></app-map>
+    </div>
+    <div class="col-sm-3">
+      <h1>Liste de Commandes</h1>
+      <div class="sidebar" cdkDropList id="cdk-drop-list-commandes"
+           [cdkDropListData]="filteredCommandes()" (cdkDropListDropped)="drop($event)">
+        @for (commande of filteredCommandes(); track $index) {
+          <div class="commande-box" cdkDrag [cdkDragData]="commande">
+            <p>ID: {{ commande.id }}</p>
+            <p>{{ commande.client.prenom }} {{ commande.client.nom }}</p>
+            <p>{{ commande.client.adresse }}</p>
+            <p>{{ commande.horairePreferable }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,108 @@
+<table class="table custom-table">
+  <thead>
+    <tr>
+      <th scope="col" (click)="sortBy('id')">
+        ID
+        @if (sortColumn === 'id') {
+          <span class="sort-indicator">
+            {{ sortDirection === 'asc' ? '▲' : '▼' }}
+          </span>
+        }
+      </th>
+      <th scope="col" (click)="sortBy('date')">
+        Date
+        @if (sortColumn === 'date') {
+          <span class="sort-indicator">
+            {{ sortDirection === 'asc' ? '▲' : '▼' }}
+          </span>
+        }
+      </th>
+      <th scope="col" (click)="sortBy('client')">
+        Client
+        @if (sortColumn === 'client') {
+          <span class="sort-indicator">
+            {{ sortDirection === 'asc' ? '▲' : '▼' }}
+          </span>
+        }
+      </th>
+      <th scope="col" (click)="sortBy('adresse')">
+        Adresse
+        @if (sortColumn === 'adresse') {
+          <span class="sort-indicator">
+            {{ sortDirection === 'asc' ? '▲' : '▼' }}
+          </span>
+        }
+      </th>
+      <th scope="col" (click)="sortBy('datecommandeestime')">
+        Date de commande estimée
+        @if (sortColumn === 'datecommandeestime') {
+          <span class="sort-indicator">
+            {{ sortDirection === 'asc' ? '▲' : '▼' }}
+          </span>
+        }
+      </th>
+      <th scope="col" (click)="sortBy('horairePreferable')">
+        Horaire Préférable
+        @if (sortColumn === 'horairePreferable') {
+          <span class="sort-indicator">
+            {{ sortDirection === 'asc' ? '▲' : '▼' }}
+          </span>
+        }
+      </th>
+      <th scope="col" (click)="sortBy('dateLivre')">
+        Date Estimée
+        @if (sortColumn === 'dateLivraisonEstimee') {
+          <span class="sort-indicator">
+            {{ sortDirection === 'asc' ? '▲' : '▼' }}
+          </span>
+        }
+      </th>
+      <th scope="col" (click)="sortBy('dateLivre')">
+        Date Livré
+        @if (sortColumn === 'dateLivre') {
+          <span class="sort-indicator">
+            {{ sortDirection === 'asc' ? '▲' : '▼' }}
+          </span>
+        }
+      </th>
+      <th scope="col" (click)="sortBy('etat')">
+        Statut
+        @if (sortColumn === 'etat') {
+          <span class="sort-indicator">
+            {{ sortDirection === 'asc' ? '▲' : '▼' }}
+          </span>
+        }
+      </th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (item of sortedCommandes(); track $index) {
+      <tr>
+        <td scope="row">{{ item.id }}</td>
+        <td>{{ item.date }}</td>
+        <td>{{ item.client.prenom }} {{ item.client.nom }}</td>
+        <td>
+          {{ item.client.adresse }}, {{ item.client.codePostal }}, {{ item.client.ville }}
+        </td>
+        <td>{{ item.dateLivraisonEstimee }}</td>
+        <td>{{ item.horairePreferable }}</td>
+        <td>{{ item.dateLivre }}</td>
+        <td>{{ item.dateLivraisonEstimee }}</td>
+        <td>
+          <span [ngClass]="{
+              'custom-status-enCours': item.etat.toString() === 'encommande',
+              'custom-status-planifiee': item.etat.toString() === 'planifiée',
+              'custom-status-effectuee': item.etat.toString() === 'livrée',
+              'custom-status-aPlanifier': item.etat.toString() === 'ouverte'
+            }" class="custom-status">
+            {{ item.etat }}
+          </span>
+        </td>
+        <td>
+          <button class="custom-action-btn modify">Modifier</button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
