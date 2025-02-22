@@ -1,0 +1,15 @@
+<div class="row">
+  <div cdkDropListGroup class="d-flex flex-row w-100">
+    <div class="col-sm-5">
+      <app-drag-drop-selector
+      [availableLivreurs]="equipeLivreurs()"
+      [availableCommandes]="commandes()"
+      (selectionChange)="handleSelectionChange($event)">
+    </app-drag-drop-selector>
+    
+  </div>
+  <div class="col-sm-7">
+    <app-map [commandes]="commandes()" [destinationsGeoCode]="destinationsGeoCode()" [createdTournees]="createdTourneesSignal()"></app-map>
+    <button class="optimiser-button" type="input" (click)="creerTournees()">Creer Tournees</button>
+  </div>
+</div>

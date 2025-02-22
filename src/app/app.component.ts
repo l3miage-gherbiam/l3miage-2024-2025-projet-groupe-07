@@ -13,13 +13,13 @@ import { OpenRouteServiceService } from './services/open-route-service.service';
 import { TableauDeBordComponent } from './components/tableau-de-bord/tableau-de-bord.component';
 import { CommandesComponent } from './components/commandes/commandes.component';
 import { GestionDequipesComponent } from './components/gestion-dequipes/gestion-dequipes.component';
-import { PlanificateurComponent } from './components/planificateur/planificateur.component';
 import { commandesExemple,equipesLivreursExample } from '../DUMMY_DATA';
 import { EquipeLivreurs} from '../models/equipeLivreurs.model';
 import { RouterOutlet } from '@angular/router';
 import { RouterModule } from '@angular/router';
 import { LoginComponent } from './components/login/login.component'
 import { TourneesComponent } from './components/tournees/tournees.component'
+import { PlanificateurAutomatiqueComponent } from './components/planificateur-automatique/planificateur.component';
 
 @Component({
   selector: 'app-root',
@@ -35,8 +35,8 @@ import { TourneesComponent } from './components/tournees/tournees.component'
     TableauDeBordComponent,
     CommandesComponent,
     GestionDequipesComponent,
-    PlanificateurComponent,
     LoginComponent,
+    PlanificateurAutomatiqueComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GeoJSON,LatLng } from 'leaflet';
+import { EquipeLivreurs } from '../../models/equipeLivreurs.model';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,7 @@ export class OpenRouteServiceService {
         return;
       }
         const data = await fetchResponse.json();
+        console.log('data haha',data);
         return data;
     }
     catch (error){
@@ -84,6 +86,62 @@ export class OpenRouteServiceService {
         return;
       }
       const data = await fetchResponse.json();
+      return data;
+    }
+    catch (error) {
+      console.error('Erreur', error);
+      return;
+    }
+  }
+
+
+  async getOptimizationAutmatique(latlngTable: LatLng[],availableEquipes: EquipeLivreurs[],entrepot: LatLng): Promise<any> {
+
+    // latlngTable = [point1, point2, point3, ...] (commandes )
+    let id = 1;
+    let vehicles = [];
+    for(let equipe of availableEquipes){
+      vehicles.push({
+        id: id,
+        profile: 'driving-car',
+        start: [entrepot.lng, entrepot.lat],
+        end: [entrepot.lng, entrepot.lat],
+        capacity: [Math.floor(latlngTable.length/availableEquipes.length)+1]
+      });
+      id++;
+    }
+    console.log('vehicles',vehicles);
+
+    const jobs = latlngTable.slice(1).map((point, index) => ({
+      id: index + 1,
+      location: [point.lng, point.lat],
+      amount: [1]
+    }));
+
+    const body = {
+      vehicles,
+      jobs,
+      geometry: true
+    };
+
+    try {
+      const fetchResponse = await fetch(
+        "https://api.openrouteservice.org/optimization",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: this.apiKey
+          },
+          body: JSON.stringify(body)
+        }
+      );
+      if (!fetchResponse.ok) {
+        console.error('Erreur', fetchResponse.statusText);
+        return;
+      }
+      const data = await fetchResponse.json();
+      console.log('data',data);
       return data;
     }
     catch (error) {

@@ -1,0 +1,68 @@
+<div class="drag-drop-container" cdkDropListGroup>
+    <!-- Available Livreurs -->
+    <div class="list-container">
+      <h3>Available Livreurs</h3>
+      <div
+        cdkDropList
+        #availableLivreursList="cdkDropList"
+        [cdkDropListData]="availableLivreurs"
+        [cdkDropListConnectedTo]="[selectedLivreursList]"
+        class="list available"
+        (cdkDropListDropped)="dropLivreurs($event)">
+        <div *ngFor="let livreur of availableLivreurs" cdkDrag class="list-item">
+          {{ livreur.id }} - {{ livreur.horaire }}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Selected Livreurs -->
+    <div class="list-container">
+      <h3>Selected Livreurs</h3>
+      <div
+        cdkDropList
+        #selectedLivreursList="cdkDropList"
+        [cdkDropListData]="selectedLivreurs"
+        [cdkDropListConnectedTo]="[availableLivreursList]"
+        class="list selected"
+        (cdkDropListDropped)="dropLivreurs($event)">
+        <div *ngFor="let livreur of selectedLivreurs" cdkDrag class="list-item">
+          {{ livreur.id }} - {{ livreur.horaire }}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="drag-drop-container" cdkDropListGroup>
+    <!-- Available Commandes -->
+    <div class="list-container">
+      <h3>Available Commandes</h3>
+      <div
+        cdkDropList
+        #availableCommandesList="cdkDropList"
+        [cdkDropListData]="availableCommandes"
+        [cdkDropListConnectedTo]="[selectedCommandesList]"
+        class="list available"
+        (cdkDropListDropped)="dropCommandes($event)">
+        <div *ngFor="let commande of availableCommandes" cdkDrag class="list-item">
+          ID: {{ commande.id }} - {{ commande.client.prenom }} {{ commande.client.nom }}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Selected Commandes -->
+    <div class="list-container">
+      <h3>Selected Commandes</h3>
+      <div
+        cdkDropList
+        #selectedCommandesList="cdkDropList"
+        [cdkDropListData]="selectedCommandes"
+        [cdkDropListConnectedTo]="[availableCommandesList]"
+        class="list selected"
+        (cdkDropListDropped)="dropCommandes($event)">
+        <div *ngFor="let commande of selectedCommandes" cdkDrag class="list-item">
+          ID: {{ commande.id }} - {{ commande.client.prenom }} {{ commande.client.nom }}
+        </div>
+      </div>
+    </div>
+  </div>
+  

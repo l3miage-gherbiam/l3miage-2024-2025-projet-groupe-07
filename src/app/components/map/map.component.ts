@@ -5,6 +5,7 @@ import { Icon, icon, LatLng, latLng, Layer, LeafletMouseEvent, MapOptions, marke
 import { OpenRouteServiceService } from '../../services/open-route-service.service';
 import { LeafletService } from '../../services/leaflet.service';
 import { colors } from '../../../models/couleurs.model';
+import { Commande } from '../../../models/commande.model';
 
 @Component({
   selector: 'app-map',
@@ -15,6 +16,7 @@ import { colors } from '../../../models/couleurs.model';
 })
 export class MapComponent {
   leafletService = inject(LeafletService);
+  openRouteService = inject(OpenRouteServiceService);
 
 
   latitude = model<number>(45.1485200);
@@ -36,40 +38,36 @@ export class MapComponent {
   layersBackup = model<Layer[]>([this.leafletService.latLngToMarker(this.center(),"entrepot")]);
   destinationsGeoCode = model<LatLng[]>([]);
 
-
-  //soit itineraire soit cheminOptimise
-  itenairaire = model<LatLng[]>([]);
-  cheminOptimise = model<LatLng[]>([]);
-
-
   colors = colors;
   colorIt = model<number>(0);
-  
 
-  ngOnChanges() {
+  commandes = input.required<Commande[]>();
+  commandesMarkers: Layer[] = [];
 
-    const newIndex = (this.colorIt() + 1) % this.colors.length;
-    this.colorIt.set(newIndex);
+  createdTournees = model<LatLng[][]>([]); 
 
-
-    let activeItinerary;
-    if (this.cheminOptimise().length > 0) {
-      activeItinerary = this.cheminOptimise();
-    } else {
-      activeItinerary = this.itenairaire();
-    }
-
-    this.layers.set([...this.layersBackup()]);
-
-    const updatedLayers = this.leafletService.updatePrintableLayers(
-      this.layers(),
-      this.destinationsGeoCode(),
-      activeItinerary,
-      this.colors[this.colorIt()].hex
-    );
-    this.layers.set(updatedLayers);
-  
-  
+  async ngOnInit() {
+    this.commandesMarkers = await this.leafletService.createMarkersForAvailableCommandes(this.commandes());
+    this.layers.set([...this.layersBackup(), ...this.commandesMarkers]);
+    this.layersBackup.set([...this.layers()]);
   }
 
+  async ngOnChanges() {
+
+    if (this.createdTournees().length) {
+      this.layers.set([...this.layersBackup()]);
+    for(const tournee of this.createdTournees()){
+      try{
+        const routePolyline = await this.leafletService.createPolylineForTournee(tournee);
+          if (routePolyline) {
+            this.layers.set([...this.layers(), routePolyline]);
+          }
+      }
+      catch(error){
+        console.log('erreur ',error);
+      }
+    }
+
+  }
+}
 }
