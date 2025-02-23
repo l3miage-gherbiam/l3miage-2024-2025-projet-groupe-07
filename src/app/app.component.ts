@@ -20,6 +20,7 @@ import { RouterModule } from '@angular/router';
 import { LoginComponent } from './components/login/login.component'
 import { TourneesComponent } from './components/tournees/tournees.component'
 import { PlanificateurAutomatiqueComponent } from './components/planificateur-automatique/planificateur.component';
+import { TourneeDetailed } from '../models/tourneeDetailed.model';
 
 @Component({
   selector: 'app-root',
@@ -48,6 +49,9 @@ export class AppComponent {
   openRouteService = inject(OpenRouteServiceService);
 
   entrepot = signal<LatLng>(latLng(45.1485200, 5.7369725));
+
+
+
 
 
 }

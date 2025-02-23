@@ -55,6 +55,7 @@ export class MapComponent {
   async ngOnChanges() {
 
     if (this.createdTournees().length) {
+      console.log('createdTournees',this.createdTournees());
       this.layers.set([...this.layersBackup()]);
     for(const tournee of this.createdTournees()){
       try{

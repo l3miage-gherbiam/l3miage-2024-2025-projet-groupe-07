@@ -1,4 +1,4 @@
-import { Component, model, signal, inject } from '@angular/core';
+import { Component, model, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MapComponent } from '../map/map.component';
 import { EquipeLivreurs } from '../../../models/equipeLivreurs.model';
@@ -15,6 +15,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { DragDropSelectorComponent } from './drag-drop-selector/drag-drop-selector.component';
+import { TourneeDetailed } from '../../../models/tourneeDetailed.model';
+import { BackendCommunicationService } from '../../services/backendCommunication.service';
 
 @Component({
   selector: 'app-planificateur-automatique',
@@ -42,6 +44,7 @@ export class PlanificateurAutomatiqueComponent {
   openRouteService = inject(OpenRouteServiceService);
   adresseGouvService = inject(AdresseGouvService);
   leafletService = inject(LeafletService);
+  backendService = inject(BackendCommunicationService);
 
   constructor(public dataService: DataService) {
     this.equipeLivreurs.set(this.dataService.equipeLivreurs());
@@ -55,6 +58,14 @@ export class PlanificateurAutomatiqueComponent {
     this.selectedCommandes.set(selection.commandes);
   }
 
+
+  tourneeDetailed = computed<TourneeDetailed>(() => ({
+    tourneeInfo: {
+      commandes: this.selectedCommandes(),
+      idTournee: '1',
+    },
+    destinations: this.createdTourneesSignal()[0]
+  }));
 
   async creerTournees() {
 
@@ -77,6 +88,8 @@ export class PlanificateurAutomatiqueComponent {
     cheminsOptimise.push(cheminOptimise);
   }
   this.createdTourneesSignal.set(cheminsOptimise);
+
+  this.backendService.submitTourneeDetailed(this.tourneeDetailed());
 
   }
 
