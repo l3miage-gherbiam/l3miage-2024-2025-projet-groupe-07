@@ -21,6 +21,7 @@ import { LoginComponent } from './components/login/login.component'
 import { TourneesComponent } from './components/tournees/tournees.component'
 import { PlanificateurAutomatiqueComponent } from './components/planificateur-automatique/planificateur.component';
 import { TourneeDetailed } from '../models/tourneeDetailed.model';
+import { AdresseGouvService } from './services/adresse-gouv.service';
 
 @Component({
   selector: 'app-root',
@@ -47,10 +48,34 @@ export class AppComponent {
   livraisons = signal<Commande[]>(commandesExemple);
   equipeLivreurs = signal<EquipeLivreurs[]>(equipesLivreursExample);
   openRouteService = inject(OpenRouteServiceService);
+  adresseGouvService = inject(AdresseGouvService);
 
   entrepot = signal<LatLng>(latLng(45.1485200, 5.7369725));
 
+  // To change Client with adresses list , this function should be executed ina service after post request when adding a new client
+  validateAdresses(clients: Client[]): void {
+    const adresses = clients.map((client) => this.adresseGouvService.createAddressString(client));
+    
+    for(const address of adresses){
+    this.adresseGouvService.geocode(address).then((response) => {
+      this.livraisons.update((livraisons) => {
+        const newLivraisons = [...livraisons];
+        const index = newLivraisons.findIndex((livraison) => this.adresseGouvService.createAddressString(livraison.client) === address);
+        if (index !== -1) {
+          newLivraisons[index].client.latitude = response[0].lat;
+          newLivraisons[index].client.latitude = response[0].lng;
+        }
+        return newLivraisons;
+      })
+    });
+  }
+  }
 
+  clients = computed(() => this.livraisons().map((livraison) => livraison.client));
+
+  async ngOnInit() {
+    this.validateAdresses(this.clients());
+  }
 
 
 

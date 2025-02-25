@@ -20,7 +20,7 @@ export class AdresseGouvService {
   constructor() { }
 
   createAddressString(client: Client): string {
-    return `${client.adresse} ${client.ville}`;
+    return `${client.adresse} ${client.ville} ${client.codePostal}`;
   }
 
   // Transforme une addresse a un tableau de coordonnées

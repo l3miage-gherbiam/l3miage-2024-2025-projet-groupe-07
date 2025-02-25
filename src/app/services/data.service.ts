@@ -5,6 +5,7 @@ import { commandesExemple, equipesLivreursExample , livreursExemple} from '../..
 import { Livreur } from '../../models/livreur.model';
 import { Tournee } from '../../models/tournee.model';
 import { StatusEquipeLivreurs } from '../../models/equipeLivreurs.model';
+import { TourneeDetailed } from '../../models/tourneeDetailed.model';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,8 @@ export class DataService {
 
   StatusEquipeLivreurs = StatusEquipeLivreurs;
   tournees = signal<Tournee[]>([]);
+  tourneesDetailed = signal<TourneeDetailed[]>([]);
+
 
   getNombreDeCommandes(): number {
     return this.commandes().length;

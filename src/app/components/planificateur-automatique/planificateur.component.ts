@@ -67,6 +67,8 @@ export class PlanificateurAutomatiqueComponent {
     destinations: this.createdTourneesSignal()[0]
   }));
 
+
+
   async creerTournees() {
 
     // create a table of LatLng for the markers of the selected commandes
@@ -75,20 +77,30 @@ export class PlanificateurAutomatiqueComponent {
 
 
     const optimizationResponse = await this.openRouteService.getOptimizationAutmatique(markersLatLng,this.selectedEquipes(),this.entrepot());
-    
+    console.log('optimizationResponse', optimizationResponse);
+
     const optimizedRoutes = optimizationResponse.routes;  
   
     let cheminsOptimise: LatLng[][] = [];
+
+
     for(let route of optimizedRoutes){
       let cheminOptimise: LatLng[] = [];
+
+      //to continue :(
+      let commandesOrderById: number[] = [];
+
       for (let i = 0; i < route.steps.length; i++) {
       const location = route.steps[i].location;
+      const commandeId = route.steps[i].id;
+      commandesOrderById.push(commandeId);
       cheminOptimise.push(new LatLng(location[1], location[0]));
     }
+
     cheminsOptimise.push(cheminOptimise);
   }
   this.createdTourneesSignal.set(cheminsOptimise);
-
+  console.log('ss',this.createdTourneesSignal());
   this.backendService.submitTourneeDetailed(this.tourneeDetailed());
 
   }
