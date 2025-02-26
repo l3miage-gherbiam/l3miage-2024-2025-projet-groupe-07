@@ -8,14 +8,13 @@
       <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
         <div class="custom-card">
           <div class="custom-card-body d-flex flex-column">
-            <h5 class="custom-card-header">Equipe {{ item.id }}</h5>
-            <p class="custom-card-text"><strong>Horaire : </strong>{{ item.horaire }}</p>
+            <h5 class="custom-card-header">Equipe {{ item.numEquipe }}</h5>
             <p class="custom-card-text">
               <strong>Statut : </strong>
               <span [ngClass]="{
-                'custom-text-success': item.status === 'pret',
-                'custom-text-warning': item.status === 'enLivraison',
-                'custom-text-danger': item.status === 'nonDisponible'
+                'custom-text-success': item.status === 'PRET',
+                'custom-text-warning': item.status === 'EN_LIVRAISON',
+                'custom-text-danger': item.status === 'NON_DISPONIBLE'
               }" class="custom-status">
                 {{ item.status }}
               </span>
@@ -25,8 +24,8 @@
               <li>{{ item.livreurs[1].nom }} {{ item.livreurs[1].prenom }}</li>
             </ul>
             <div class="custom-actions mt-auto">
-  <button class="custom-btn custom-btn-primary btn-sm" (click)="modifierEquipe(item.id!)">Modifier</button>
-  <button class="custom-btn custom-btn-danger btn-sm" (click)="supprimerEquipe(item.id!)">Supprimer</button>
+  <button class="custom-btn custom-btn-primary btn-sm" (click)="modifierEquipe(item.numEquipe!)">Modifier</button>
+  <button class="custom-btn custom-btn-danger btn-sm" (click)="supprimerEquipe(item.numEquipe!)">Supprimer</button>
 </div>
           </div>
         </div>
@@ -48,7 +47,7 @@
           <label for="livreur1">Sélectionnez le premier livreur</label>
           <select id="livreur1" class="form-control" [(ngModel)]="equipeForm().livreur1" name="livreur1">
             @for (l of availableLivreurs(); track $index) {
-            <option [value]="l.id">
+            <option [value]="l.idEmploye">
               {{ l.prenom }} {{ l.nom }}
             </option>
           }
@@ -58,22 +57,20 @@
           <label for="livreur2">Sélectionnez le second livreur</label>
           <select id="livreur2" class="form-control" [(ngModel)]="equipeForm().livreur2" name="livreur2">
             @for (l of availableLivreurs(); track $index) {
-            <option [value]="l.id">
+            <option [value]="l.idEmploye">
               {{ l.prenom }} {{ l.nom }}
             </option>
           }
           </select>
         </div>
         <div class="form-group mb-3">
-          <label for="horaire">Horaire (par défaut 8-17h)</label>
-          <input type="text" id="horaire" class="form-control" [(ngModel)]="equipeForm().horaire" name="horaire" placeholder="8-17h">
-        </div>
+            </div>
         <div class="form-group mb-3">
           <label for="status">Statut</label>
           <select id="status" class="form-control" [(ngModel)]="equipeForm().status" name="status">
-            <option [value]="StatusEquipeLivreurs.EnLivraison">En Livraison</option>
-            <option [value]="StatusEquipeLivreurs.Ready">Ready</option>
-            <option [value]="StatusEquipeLivreurs.NonAvailable">Non Disponible</option>
+            <option [value]="StatusEquipeLivreurs.EN_LIVRAISON">En Livraison</option>
+            <option [value]="StatusEquipeLivreurs.PRET">Ready</option>
+            <option [value]="StatusEquipeLivreurs.NON_DISPONIBLE">Non Disponible</option>
           </select>
         </div>
       </form>

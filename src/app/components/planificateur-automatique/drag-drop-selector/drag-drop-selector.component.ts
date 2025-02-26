@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { EquipeLivreurs } from '../../../../models/equipeLivreurs.model';
-import { Commande } from '../../../../models/commande.model';
+import { EquipeLivreurs } from '../../../../models/interfaces/equipe-livreurs.model';
+import { Commande } from '../../../../models/interfaces/commande.model';
 import { CommonModule } from '@angular/common';
 
 @Component({

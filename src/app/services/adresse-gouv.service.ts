@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { LatLng, latLng } from 'leaflet';
-import { Client } from '../../models/client.model';
+import { Client } from '../../models/interfaces/client.model';
+import { Adresse } from '../../models/interfaces/adresse.model';
 
 interface GeoFeature {
   geometry: {
@@ -19,13 +20,29 @@ export class AdresseGouvService {
 
   constructor() { }
 
-  createAddressString(client: Client): string {
-    return `${client.adresse} ${client.ville} ${client.codePostal}`;
+  createAddressString(adresse: Adresse): string {
+    return `${adresse.adressePostal} ${adresse.complementAdresse} ${adresse.ville} ${adresse.codePostal}`;
   }
 
+  async validateAdresses(adresses: Adresse[]): Promise<Adresse[]> {
+    const newAdresses = [...adresses];
+    
+    for (let i = 0; i < adresses.length; i++) {
+        try {
+            const response = await this.geocode(adresses[i]);
+            newAdresses[i].latitude = response[0].lat;
+            newAdresses[i].longitude = response[0].lng;
+        } catch (error) {
+            console.error(`Failed to geocode address: ${adresses[i]}`, error);
+        }
+    }
+    
+    return newAdresses;
+}
+
   // Transforme une addresse a un tableau de coordonnées
-  async geocode(address: string): Promise<LatLng[]> {
-    const query = address.split(' ').join('+');
+  async geocode(adresse: Adresse): Promise<LatLng[]> {
+    const query = this.createAddressString(adresse).split(' ').join('+');
     const url = `https://api-adresse.data.gouv.fr/search/?q=${query}`;
     try {
       const response = await fetch(url);

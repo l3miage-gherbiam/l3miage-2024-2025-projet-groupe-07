@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GeoJSON,LatLng } from 'leaflet';
-import { EquipeLivreurs } from '../../models/equipeLivreurs.model';
+import { EquipeLivreurs } from '../../models/interfaces/equipe-livreurs.model';
 
 @Injectable({
   providedIn: 'root'

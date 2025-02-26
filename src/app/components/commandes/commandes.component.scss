@@ -62,19 +62,19 @@
 }
 
 /* Couleurs conditionnelles selon EtatLivraison */
-.custom-status-enCours {
+.custom-status-EN_LIVRAISON {
   color: #fd7e14;  /* orange */
 }
 
-.custom-status-planifiee {
+.custom-status-PLANIFIEE {
   color: #007bff;  /* bleu */
 }
 
-.custom-status-effectuee {
+.custom-status-LIVREE {
   color: #28a745;  /* vert */
 }
 
-.custom-status-aPlanifier {
+.custom-status-OUVERTE {
   color: #6c757d;  /* gris */
 }
 

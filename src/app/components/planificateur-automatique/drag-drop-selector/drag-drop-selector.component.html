@@ -10,7 +10,7 @@
         class="list available"
         (cdkDropListDropped)="dropLivreurs($event)">
         <div *ngFor="let livreur of availableLivreurs" cdkDrag class="list-item">
-          {{ livreur.id }} - {{ livreur.horaire }}
+          {{ livreur.numEquipe }} - {{ livreur.livreurs[0].prenom }} {{ livreur.livreurs[0].nom }} et {{ livreur.livreurs[1].prenom }} {{ livreur.livreurs[1].nom }}
         </div>
       </div>
     </div>
@@ -26,7 +26,7 @@
         class="list selected"
         (cdkDropListDropped)="dropLivreurs($event)">
         <div *ngFor="let livreur of selectedLivreurs" cdkDrag class="list-item">
-          {{ livreur.id }} - {{ livreur.horaire }}
+          {{ livreur.numEquipe }} - {{ livreur.livreurs[0].prenom }} {{ livreur.livreurs[0].nom }} et {{ livreur.livreurs[1].prenom }} {{ livreur.livreurs[1].nom }}
         </div>
       </div>
     </div>
@@ -44,7 +44,7 @@
         class="list available"
         (cdkDropListDropped)="dropCommandes($event)">
         <div *ngFor="let commande of availableCommandes" cdkDrag class="list-item">
-          ID: {{ commande.id }} - {{ commande.client.prenom }} {{ commande.client.nom }}
+          ID: {{ commande.reference }} - {{ commande.client.prenom }} {{ commande.client.nom }}
         </div>
       </div>
     </div>
@@ -60,7 +60,7 @@
         class="list selected"
         (cdkDropListDropped)="dropCommandes($event)">
         <div *ngFor="let commande of selectedCommandes" cdkDrag class="list-item">
-          ID: {{ commande.id }} - {{ commande.client.prenom }} {{ commande.client.nom }}
+          ID: {{ commande.reference }} - {{ commande.client.prenom }} {{ commande.client.nom }}
         </div>
       </div>
     </div>

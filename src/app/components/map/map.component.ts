@@ -4,8 +4,7 @@ import { LeafletModule } from '@bluehalo/ngx-leaflet';
 import { Icon, icon, LatLng, latLng, Layer, LeafletMouseEvent, MapOptions, marker, Marker, polyline, Polyline, tileLayer } from 'leaflet';
 import { OpenRouteServiceService } from '../../services/open-route-service.service';
 import { LeafletService } from '../../services/leaflet.service';
-import { colors } from '../../../models/couleurs.model';
-import { Commande } from '../../../models/commande.model';
+import { Commande } from '../../../models/interfaces/commande.model';
 
 @Component({
   selector: 'app-map',
@@ -38,8 +37,6 @@ export class MapComponent {
   layersBackup = model<Layer[]>([this.leafletService.latLngToMarker(this.center(),"entrepot")]);
   destinationsGeoCode = model<LatLng[]>([]);
 
-  colors = colors;
-  colorIt = model<number>(0);
 
   commandes = input.required<Commande[]>();
   commandesMarkers: Layer[] = [];

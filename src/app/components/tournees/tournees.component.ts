@@ -1,7 +1,7 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../../services/data.service';
-import { Tournee } from '../../../models/tournee.model';
+import { Tournee } from '../../../models/interfaces/tournee.model';
 
 @Component({
   selector: 'app-tournees',
@@ -49,11 +49,11 @@ export class TourneesComponent {
   getFieldValue(item: Tournee, column: string): any {
     switch (column) {
       case 'idTournee':
-        return item.idTournee || '';
+        return item.numTournee || '';
       case 'jour':
-        return item.jour || '';
+        return item.date || '';
       case 'equipe':
-        return item.equipe?.id || '';
+        return item.equipeLivreur?.numEquipe || '';
       case 'camion':
         return item.camion || '';
       case 'distanceAParcourir':
@@ -63,7 +63,7 @@ export class TourneesComponent {
     }
   }
 
-  trackById(index: number, item: Tournee): string {
-    return item.idTournee|| '';;
+  trackById(index: number, item: Tournee): number {
+    return item.numTournee ?? undefined ;;
   }
 }

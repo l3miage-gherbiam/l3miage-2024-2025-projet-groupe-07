@@ -1,8 +1,8 @@
 import { Component, model, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MapComponent } from '../map/map.component';
-import { EquipeLivreurs } from '../../../models/equipeLivreurs.model';
-import { Commande } from '../../../models/commande.model';
+import { EquipeLivreurs } from '../../../models/interfaces/equipe-livreurs.model';
+import { Commande } from '../../../models/interfaces/commande.model';
 import { FormsModule } from '@angular/forms';
 import { OpenRouteServiceService } from '../../services/open-route-service.service';
 import { AdresseGouvService } from '../../services/adresse-gouv.service';
@@ -15,8 +15,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { DragDropSelectorComponent } from './drag-drop-selector/drag-drop-selector.component';
-import { TourneeDetailed } from '../../../models/tourneeDetailed.model';
-import { BackendCommunicationService } from '../../services/backendCommunication.service';
+// import { TourneeDetailed } from '../../../models/tourneeDetailed.model';
+// import { BackendCommunicationService } from '../../services/backendCommunication.service';
 
 @Component({
   selector: 'app-planificateur-automatique',
@@ -44,7 +44,7 @@ export class PlanificateurAutomatiqueComponent {
   openRouteService = inject(OpenRouteServiceService);
   adresseGouvService = inject(AdresseGouvService);
   leafletService = inject(LeafletService);
-  backendService = inject(BackendCommunicationService);
+  // backendService = inject(BackendCommunicationService);
 
   constructor(public dataService: DataService) {
     this.equipeLivreurs.set(this.dataService.equipeLivreurs());
@@ -59,13 +59,13 @@ export class PlanificateurAutomatiqueComponent {
   }
 
 
-  tourneeDetailed = computed<TourneeDetailed>(() => ({
-    tourneeInfo: {
-      commandes: this.selectedCommandes(),
-      idTournee: '1',
-    },
-    destinations: this.createdTourneesSignal()[0]
-  }));
+  // tourneeDetailed = computed<TourneeDetailed>(() => ({
+  //   tourneeInfo: {
+  //     commandes: this.selectedCommandes(),
+  //     idTournee: '1',
+  //   },
+  //   destinations: this.createdTourneesSignal()[0]
+  // }));
 
 
 
@@ -101,7 +101,7 @@ export class PlanificateurAutomatiqueComponent {
   }
   this.createdTourneesSignal.set(cheminsOptimise);
   console.log('ss',this.createdTourneesSignal());
-  this.backendService.submitTourneeDetailed(this.tourneeDetailed());
+  // this.backendService.submitTourneeDetailed(this.tourneeDetailed());
 
   }
 

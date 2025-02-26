@@ -79,11 +79,11 @@
   <tbody>
     @for (item of sortedCommandes(); track $index) {
       <tr>
-        <td scope="row">{{ item.id }}</td>
+        <td scope="row">{{ item.reference }}</td>
         <td>{{ item.date }}</td>
         <td>{{ item.client.prenom }} {{ item.client.nom }}</td>
         <td>
-          {{ item.client.adresse }}, {{ item.client.codePostal }}, {{ item.client.ville }}
+          {{ this.adresseGouvService.createAddressString(item.client.adresse) }}
         </td>
         <td>{{ item.dateLivraisonEstimee }}</td>
         <td>{{ item.horairePreferable }}</td>
@@ -91,10 +91,10 @@
         <td>{{ item.dateLivraisonEstimee }}</td>
         <td>
           <span [ngClass]="{
-              'custom-status-enCours': item.etat.toString() === 'encommande',
-              'custom-status-planifiee': item.etat.toString() === 'planifiée',
-              'custom-status-effectuee': item.etat.toString() === 'livrée',
-              'custom-status-aPlanifier': item.etat.toString() === 'ouverte'
+              'custom-status-EN_LIVRAISON': item.etat === EtatCommande.EN_LIVRAISON,
+              'custom-status-PLANIFIEE': item.etat === EtatCommande.PLANIFIEE,
+              'custom-status-LIVREE': item.etat === EtatCommande.LIVREE,
+              'custom-status-OUVERTE': item.etat === EtatCommande.OUVERTE
             }" class="custom-status">
             {{ item.etat }}
           </span>

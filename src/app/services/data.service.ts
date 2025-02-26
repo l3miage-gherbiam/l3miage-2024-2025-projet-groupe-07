@@ -1,11 +1,10 @@
 import { Injectable, signal } from '@angular/core';
-import { Commande } from '../../models/commande.model';
-import { EquipeLivreurs } from '../../models/equipeLivreurs.model';
+import { Commande } from '../../models/interfaces/commande.model';
+import { EquipeLivreurs } from '../../models/interfaces/equipe-livreurs.model';
 import { commandesExemple, equipesLivreursExample , livreursExemple} from '../../DUMMY_DATA';
-import { Livreur } from '../../models/livreur.model';
-import { Tournee } from '../../models/tournee.model';
-import { StatusEquipeLivreurs } from '../../models/equipeLivreurs.model';
-import { TourneeDetailed } from '../../models/tourneeDetailed.model';
+import { Livreur } from '../../models/interfaces/livreur.model';
+import { Tournee } from '../../models/interfaces/tournee.model';
+import { StatusEquipeLivreurs } from '../../models/enums/status-equipe-livreurs.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +17,6 @@ export class DataService {
 
   StatusEquipeLivreurs = StatusEquipeLivreurs;
   tournees = signal<Tournee[]>([]);
-  tourneesDetailed = signal<TourneeDetailed[]>([]);
 
 
   getNombreDeCommandes(): number {
@@ -26,14 +24,14 @@ export class DataService {
   }
 
   getCommandesEffectuees(): number {
-    return this.commandes().filter(l => l.etat === 'livrée').length;
+    return this.commandes().filter(l => l.etat === 'LIVREE').length;
   }
 
   getCommandesEnCours(): number {
-    return this.commandes().filter(l => l.etat === 'enlivraison').length;
+    return this.commandes().filter(l => l.etat === 'EN_LIVRAISON').length;
   }
 
   getCommandesEnAttente(): number {
-    return this.commandes().filter(l => l.etat === 'ouverte').length;
+    return this.commandes().filter(l => l.etat === 'OUVERTE').length;
   }
 }

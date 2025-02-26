@@ -1,8 +1,9 @@
 import { Component, signal, inject } from '@angular/core';
-import { Commande } from '../../../models/commande.model';
+import { Commande } from '../../../models/interfaces/commande.model';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../../services/data.service';
-
+import { AdresseGouvService } from '../../services/adresse-gouv.service';
+import { EtatCommande } from '../../../models/enums/etat-commande.enum';
 @Component({
   selector: 'app-livraisons',
   imports: [CommonModule],
@@ -16,6 +17,8 @@ export class CommandesComponent {
   sortDirection: 'asc' | 'desc' = 'asc';
 
   dataService = inject(DataService);
+  adresseGouvService = inject(AdresseGouvService);
+  EtatCommande = EtatCommande;
 
   constructor() {
     this.commandes.set(this.dataService.commandes());
@@ -47,14 +50,14 @@ export class CommandesComponent {
 
   getFieldValue(item: Commande, column: string): any {
     switch (column) {
-      case 'id':
-        return parseInt(item.id.replace(/[^\d]/g, ''), 10);
+      case 'reference':
+        return parseInt(item.reference.replace(/[^\d]/g, ''), 10);
       case 'date':
         return item.date || '';
       case 'client':
         return (item.client.prenom + ' ' + item.client.nom).toLowerCase();
       case 'adresse':
-        return item.client.adresse.toLowerCase();
+        return this.adresseGouvService.createAddressString(item.client.adresse);
       case 'telephone':
         return item.client.telephone;
       case 'horairePreferable':

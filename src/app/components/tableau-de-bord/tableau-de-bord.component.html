@@ -28,10 +28,10 @@
       <h1 class="section-title">Équipes Livreurs</h1>
       <div class="teams-group">
         <h3 class="sub-section-title">Actives</h3>
-        @for (item of dataService.equipeLivreurs(); track item.id) {
-          @if (item.status === dataService.StatusEquipeLivreurs.EnLivraison) {
+        @for (item of dataService.equipeLivreurs(); track item.numEquipe) {
+          @if (item.status === dataService.StatusEquipeLivreurs.EN_LIVRAISON) {
             <p class="team-item">
-              <span class="team-id">{{ item.id }}</span> :
+              <span class="team-id">{{ item.numEquipe }}</span> :
               <span class="team-names">{{ item.livreurs[0].prenom }} et {{ item.livreurs[1].prenom }}</span>
             </p>
           }
@@ -39,10 +39,10 @@
       </div>
       <div class="teams-group">
         <h3 class="sub-section-title">Prêtes</h3>
-        @for (item of dataService.equipeLivreurs(); track item.id) {
-          @if (item.status === dataService.StatusEquipeLivreurs.Ready  ) {
+        @for (item of dataService.equipeLivreurs(); track item.numEquipe) {
+          @if (item.status === dataService.StatusEquipeLivreurs.PRET  ) {
             <p class="team-item">
-              <span class="team-id">{{ item.id }}</span> :
+              <span class="team-id">{{ item.numEquipe }}</span> :
               <span class="team-names">{{ item.livreurs[0].prenom }} et {{ item.livreurs[1].prenom }}</span>
             </p>
           }

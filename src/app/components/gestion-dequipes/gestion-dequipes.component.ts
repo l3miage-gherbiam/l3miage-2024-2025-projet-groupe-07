@@ -1,15 +1,16 @@
 import { Component, inject, model, signal } from '@angular/core';
-import { EquipeLivreurs, StatusEquipeLivreurs } from '../../../models/equipeLivreurs.model';
+import { EquipeLivreurs } from '../../../models/interfaces/equipe-livreurs.model';
+import { StatusEquipeLivreurs } from '../../../models/enums/status-equipe-livreurs.enum';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
-import { Livreur } from '../../../models/livreur.model';
+import { Livreur } from '../../../models/interfaces/livreur.model';
 
 @Component({
   selector: 'app-gestion-dequipes',
   imports: [CommonModule, FormsModule],
   templateUrl: './gestion-dequipes.component.html',
-  styleUrl: './gestion-dequipes.component.scss'
+  styleUrls: ['./gestion-dequipes.component.scss']
 })
 export class GestionDequipesComponent {
   dataService = inject(DataService);
@@ -24,15 +25,15 @@ export class GestionDequipesComponent {
   showModal = signal(false);
 
   // Formulaire pour créer ou modifier une équipe
+  // Note : nous incluons ici le statut, mais retirons la propriété "horaire" qui n'existe pas dans EquipeLivreurs.
   equipeForm = model({
     livreur1: '',
     livreur2: '',
-    horaire: '8-17h',
-    status: StatusEquipeLivreurs.Ready
+    status: StatusEquipeLivreurs.PRET
   });
 
-  // ID de l'équipe en cours de modification (null si création)
-  editingEquipeId = signal<string | null>(null);
+  // Numéro de l'équipe en cours de modification (null si création)
+  editingEquipeId = signal<number | null>(null);
 
   // Enumération des statuts pour le template
   StatusEquipeLivreurs = StatusEquipeLivreurs;
@@ -53,114 +54,107 @@ export class GestionDequipesComponent {
 
   // Mettre à jour la liste des livreurs disponibles
   updateAvailableLivreurs(): void {
-    const livreursDisponibles = this.dataService.livreurs().filter(l => l.status === 'nonAffecté');
+    const livreursDisponibles = this.dataService.livreurs().filter(l => l.affecte === false);
     this.availableLivreurs.set(livreursDisponibles);
   }
 
   // Créer une nouvelle équipe
   creerEquipe(): void {
-    const livreur1 = this.dataService.livreurs().find(l => l.id === this.equipeForm().livreur1);
-    const livreur2 = this.dataService.livreurs().find(l => l.id === this.equipeForm().livreur2);
+    const livreur1 = this.dataService.livreurs().find(l => l.idEmploye === this.equipeForm().livreur1);
+    const livreur2 = this.dataService.livreurs().find(l => l.idEmploye === this.equipeForm().livreur2);
 
     if (livreur1 && livreur2) {
       const nouvelleEquipe: EquipeLivreurs = {
-        id: this.genererNouvelId(),
+        numEquipe: this.genererNouvelId(),
         livreurs: [livreur1, livreur2],
-        horaire: this.equipeForm().horaire,
-        status: this.equipeForm().status
+        status: StatusEquipeLivreurs.PRET
       };
 
       // Mettre à jour le statut des livreurs
-      livreur1.status = 'affecté';
-      livreur2.status = 'affecté';
+      livreur1.affecte = true;
+      livreur2.affecte = true;
 
-      // Mettre à jour la liste des équipes
+      // Ajouter l'équipe aux listes locales et dans le service
       this.equipeLivreurs.update(old => [...old, nouvelleEquipe]);
       this.dataService.equipeLivreurs.update(old => [...old, nouvelleEquipe]);
 
       // Mettre à jour la liste des livreurs disponibles
       this.updateAvailableLivreurs();
 
-      // Fermer le modal
+      // Fermer le modal et réinitialiser le formulaire
       this.showModal.set(false);
-      this.equipeForm.set({ livreur1: '', livreur2: '', horaire: '8-17h', status: StatusEquipeLivreurs.Ready });
+      this.equipeForm.set({ livreur1: '', livreur2: '', status: StatusEquipeLivreurs.PRET });
     }
   }
 
   // Modifier une équipe existante
-  modifierEquipe(id: string): void {
-    const equipe = this.equipeLivreurs().find(e => e.id === id);
+  modifierEquipe(numEquipe: number): void {
+    const equipe = this.equipeLivreurs().find(e => e.numEquipe === numEquipe);
     if (equipe) {
       this.equipeForm.set({
-        livreur1: equipe.livreurs[0].id,
-        livreur2: equipe.livreurs[1].id,
-        horaire: equipe.horaire,
+        livreur1: equipe.livreurs[0].idEmploye,
+        livreur2: equipe.livreurs[1].idEmploye,
         status: equipe.status
       });
-      this.editingEquipeId.set(id);
+      this.editingEquipeId.set(numEquipe);
       this.showModal.set(true);
     }
   }
 
   // Enregistrer les modifications d'une équipe
   enregistrerModification(): void {
-    const id = this.editingEquipeId();
-    if (id) {
-      const livreur1 = this.dataService.livreurs().find(l => l.id === this.equipeForm().livreur1);
-      const livreur2 = this.dataService.livreurs().find(l => l.id === this.equipeForm().livreur2);
+    const numEquipe = this.editingEquipeId();
+    if (numEquipe !== null) {
+      const livreur1 = this.dataService.livreurs().find(l => l.idEmploye === this.equipeForm().livreur1);
+      const livreur2 = this.dataService.livreurs().find(l => l.idEmploye === this.equipeForm().livreur2);
 
       if (livreur1 && livreur2) {
         const equipeModifiee: EquipeLivreurs = {
-          id: id,
+          numEquipe: numEquipe,
           livreurs: [livreur1, livreur2],
-          horaire: this.equipeForm().horaire,
           status: this.equipeForm().status
         };
 
         // Rendre "nonAffecté" les livreurs qui ne sont plus dans l'équipe
-        const ancienneEquipe = this.equipeLivreurs().find(e => e.id === id);
+        const ancienneEquipe = this.equipeLivreurs().find(e => e.numEquipe === numEquipe);
         if (ancienneEquipe) {
           ancienneEquipe.livreurs.forEach(livreur => {
-            if (livreur.id !== livreur1.id && livreur.id !== livreur2.id) {
-              livreur.status = 'nonAffecté';
+            if (livreur.idEmploye !== livreur1.idEmploye && livreur.idEmploye !== livreur2.idEmploye) {
+              livreur.affecte = false;
             }
           });
         }
 
         // Mettre à jour le statut des nouveaux livreurs
-        livreur1.status = 'affecté';
-        livreur2.status = 'affecté';
-
+        livreur1.affecte = true;
+        livreur2.affecte = true;
         // Mettre à jour la liste des équipes
-        this.equipeLivreurs.update(old => old.map(equipe => {
-          if (equipe.id === id) {
-            return equipeModifiee;
-          }
-          return equipe;
-        }));
+        this.equipeLivreurs.update(old =>
+          old.map(equipe => (equipe.numEquipe === numEquipe ? equipeModifiee : equipe))
+        );
 
         // Mettre à jour la liste des livreurs disponibles
         this.updateAvailableLivreurs();
 
-        // Fermer le modal
+        // Fermer le modal et réinitialiser le formulaire
         this.showModal.set(false);
         this.editingEquipeId.set(null);
-        this.equipeForm.set({ livreur1: '', livreur2: '', horaire: '8-17h', status: StatusEquipeLivreurs.Ready });
+        this.equipeForm.set({ livreur1: '', livreur2: '', status: StatusEquipeLivreurs.PRET });
       }
     }
   }
 
   // Supprimer une équipe
-  supprimerEquipe(id: string): void {
-    const equipe = this.equipeLivreurs().find(e => e.id === id);
+  supprimerEquipe(numEquipe: number): void {
+    const equipe = this.equipeLivreurs().find(e => e.numEquipe === numEquipe);
     if (equipe) {
       // Rendre "nonAffecté" les livreurs de l'équipe
       equipe.livreurs.forEach(livreur => {
-        livreur.status = 'nonAffecté';
+        livreur.affecte = false;
       });
 
       // Supprimer l'équipe de la liste
-      this.equipeLivreurs.update(old => old.filter(e => e.id !== id));
+      this.equipeLivreurs.update(old => old.filter(e => e.numEquipe !== numEquipe));
 
       // Mettre à jour la liste des livreurs disponibles
       this.updateAvailableLivreurs();
@@ -171,16 +165,18 @@ export class GestionDequipesComponent {
   annulerCreation(): void {
     this.showModal.set(false);
     this.editingEquipeId.set(null);
-    this.equipeForm.set({ livreur1: '', livreur2: '', horaire: '8-17h', status: StatusEquipeLivreurs.Ready });
+    this.equipeForm.set({ livreur1: '', livreur2: '', status: StatusEquipeLivreurs.PRET });
   }
 
   // Générer un nouvel ID pour une équipe
-  genererNouvelId(): string {
+  genererNouvelId(): number {
     let dernier = 0;
     this.equipeLivreurs().forEach(equipe => {
-      const num = equipe.id ? parseInt(equipe.id.replace(/[^\d]/g, ''), 10) : 0;
-      if (num > dernier) dernier = num;
+      const num = equipe.numEquipe || 0;
+      if (num > dernier) {
+        dernier = num;
+      }
     });
-    return 'T' + (dernier + 1);
+    return dernier + 1;
   }
 }

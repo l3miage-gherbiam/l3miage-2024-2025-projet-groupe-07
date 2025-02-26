@@ -8,7 +8,7 @@
         <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
           <div class="custom-card">
             <div class="custom-card-body d-flex flex-column">
-              <h5 class="custom-card-header">Livreur {{ item.id }}</h5>
+              <h5 class="custom-card-header">Livreur {{ item.idEmploye }}</h5>
               <p class="custom-card-text"><strong>Nom : </strong>{{ item.nom }}</p>
               <p class="custom-card-text"><strong>Prénom : </strong>{{ item.prenom }}</p>
               <p class="custom-card-text"><strong>Téléphone : </strong>{{ item.telephone }}</p>
@@ -17,15 +17,15 @@
               <p class="custom-card-text">
                 <strong>Statut : </strong>
                 <span [ngClass]="{
-                  'custom-text-success': item.status === 'affecté',
-                  'custom-text-warning': item.status === 'nonAffecté'
+                  'custom-text-success': item.affecte === true,
+                  'custom-text-warning': item.affecte === false
                 }" class="custom-status">
-                  {{ item.status }}
+                  {{ item.affecte ? 'Affecté' : 'Non Affecté' }}
                 </span>
               </p>
               <div class="custom-actions mt-auto">
-                <button class="custom-btn custom-btn-primary btn-sm" (click)="modifierLivreur(item.id!)">Modifier</button>
-                <button class="custom-btn custom-btn-danger btn-sm" (click)="supprimerLivreur(item.id!)">Supprimer</button>
+                <button class="custom-btn custom-btn-primary btn-sm" (click)="modifierLivreur(item.idEmploye!)">Modifier</button>
+                <button class="custom-btn custom-btn-danger btn-sm" (click)="supprimerLivreur(item.idEmploye!)">Supprimer</button>
               </div>
             </div>
           </div>

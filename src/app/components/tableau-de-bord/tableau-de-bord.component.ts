@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { DataService } from '../../services/data.service';
-import { StatusEquipeLivreurs } from '../../../models/equipeLivreurs.model';
+import { StatusEquipeLivreurs } from '../../../models/enums/status-equipe-livreurs.enum';
 
 @Component({
   selector: 'app-tableau-de-bord',

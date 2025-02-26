@@ -1,7 +1,7 @@
 import { Injectable,inject } from '@angular/core';
 import { GeoJSON } from 'leaflet';
 import { latLng, LatLng, Marker,marker,icon,Icon,Layer,Polyline,polyline } from 'leaflet';
-import { Commande } from '../../models/commande.model';
+import { Commande } from '../../models/interfaces/commande.model';
 import { AdresseGouvService } from './adresse-gouv.service';
 import { OpenRouteServiceService } from './open-route-service.service';
 
@@ -60,8 +60,7 @@ export class LeafletService {
   private async getLatLngsFromCommandes(commandes: Commande[]): Promise<LatLng[]> {
     const latLngs: LatLng[] = [];
     for (const commande of commandes) {
-      const fullAdresse = this.adresseGouvService.createAddressString(commande.client);
-      const result = await this.adresseGouvService.geocode(fullAdresse);
+      const result = await this.adresseGouvService.geocode(commande.client.adresse);
       if (result?.length) {
         latLngs.push(result[0]);
       }
