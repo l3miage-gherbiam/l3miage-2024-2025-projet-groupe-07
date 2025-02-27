@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { LatLng, latLng } from 'leaflet';
 import { Client } from '../../models/interfaces/client.model';
 import { Livreur } from '../../models/interfaces/livreur.model';
-import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { catchError, Observable, throwError } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 // import { TourneeDetailed } from '../../models/tourneeDetailed.model';
 
 
@@ -19,8 +19,30 @@ export class BackendCommunicationService {
   }
 
   postLivreur(livreur : Livreur) : Observable<any> {
-    return this.http.post("http://localhost:8080/api/livreur", livreur)
+    return this.http.post<Livreur>("http://localhost:8080/api/livreur", livreur).pipe(
+        catchError(this.handleError))
+  }
+
+  // async postLivreur(livreur: Livreur): Promise<any> {
+  //   const response = await fetch('http://localhost:8080/api/livreur', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     body: JSON.stringify(livreur)
+  //   }
+  //   );
+  //   return response.json();
+  // }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.status === 0) {
+      console.error('❌ Erreur réseau : API injoignable.', error.error);
+    } else {
+      console.error(`❌ Erreur HTTP ${error.status}:`, error.error);
+    }
+
+    // ✅ Message personnalisé pour l'utilisateur
+    return throwError(() => new Error('⚠️ Impossible de récupérer les données. Vérifiez l’URL et réessayez.'));
   }
 }
-
-

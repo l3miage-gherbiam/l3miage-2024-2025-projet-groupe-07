@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { Livreur } from '../../../models/interfaces/livreur.model';
 import { BackendCommunicationService } from '../../services/backendCommunication.service';
+import { HttpClientModule } from '@angular/common/http';
+import { dummyEntrepot } from '../../../DUMMY_DATA';
 // Note: Import Agenda and Entrepot if needed for proper typing of default values.
 
 @Component({
@@ -15,7 +17,7 @@ import { BackendCommunicationService } from '../../services/backendCommunication
 export class LivreursComponent {
 
   dataService = inject(DataService);
-  backednService = inject(BackendCommunicationService);
+  backendService = inject(BackendCommunicationService);
 
   // Liste des livreurs (utilisant un signal)
   livreurs = model.required<Livreur[]>();
@@ -26,24 +28,22 @@ export class LivreursComponent {
   // Formulaire pour créer ou modifier un livreur.
   // Le champ "status" ici est utilisé pour l'affichage (avec les valeurs "affecté" / "nonAffecté")
   // et sera converti en la propriété boolean "affecte" lors de la création/modification.
-  livreurForm = model<{
-    nom: string,
-    prenom: string,
-    telephone: string,
-    photoURL: string,
-    aPermis: boolean,
-    email: string,
-    entrepot: string, // Ce champ est de type string dans le formulaire. Vous devrez convertir ou rechercher l'objet Entrepot approprié.
-    status: "affecté" | "nonAffecté"
-  }>({
+  livreurForm = model<Livreur>({
     nom: '',
     prenom: '',
     telephone: '',
     photoURL: '',
     aPermis: true,
     email: '',
-    entrepot: '',
-    status: 'nonAffecté'
+    affecte: false,
+    entrepot: dummyEntrepot('blabla'),
+    disponibilite: {
+      idAgenda: '',
+      creneaux: []
+    },
+    dateExpirationPermis: new Date("2000-01-01"),
+    idEmploye: '',
+    dateNaissance: new Date("2000-01-01")
   });
 
   // ID du livreur en cours de modification (null si création)
@@ -56,7 +56,9 @@ export class LivreursComponent {
 
   // Initialisation des données
   initializeData(): void {
-    // Charger les livreurs depuis le service
+    // this.backendService.getLivreurs().subscribe(
+    //   livreurs => this.livreurs.set(livreurs)
+    // );
     this.livreurs.set(this.dataService.livreurs());
   }
 
@@ -75,17 +77,25 @@ export class LivreursComponent {
       entrepot: this.livreurForm().entrepot as any,
       // Fournir des valeurs par défaut pour les propriétés requises de Livreur.
       disponibilite: {} as any, // Remplacez ceci par une valeur par défaut appropriée pour Agenda.
-      dateExpirationPermis: new Date(), // Remplacez par la date d'expiration réelle.
-      dateNaissance: new Date(), // Remplacez par la date de naissance réelle.
-      affecte: this.livreurForm().status === 'affecté'
+      dateExpirationPermis: new Date("2000-01-01"), // Remplacez par la date d'expiration réelle.
+      dateNaissance: new Date("2000-01-01"), // Remplacez par la date de naissance réelle.
+      affecte: this.livreurForm().affecte === true
     };
 
     // Ajouter le nouveau livreur à la liste
-    this.backednService.postLivreur(nouveauLivreur);
-
+    this.backendService.postLivreur(nouveauLivreur).subscribe({
+      next: (response) => {
+        console.log("Livreur posted:", response);
+        // Update your state or perform additional logic here.
+      },
+      error: (error) => {
+        console.error("Error posting livreur:", error);
+      }
+    });
+    // if resonse =200{
     this.livreurs.update(old => [...old, nouveauLivreur]);
     this.dataService.livreurs.update(old => [...old, nouveauLivreur]);
-
+  
     // Fermer le modal et réinitialiser le formulaire
     this.showModal.set(false);
     this.livreurForm.set({
@@ -95,8 +105,15 @@ export class LivreursComponent {
       photoURL: '',
       aPermis: true,
       email: '',
-      entrepot: '',
-      status: 'nonAffecté'
+      affecte: false,
+      entrepot: dummyEntrepot('blabla'),
+      disponibilite: {
+        idAgenda: '',
+        creneaux: []
+      },
+      dateExpirationPermis: new Date("2000-01-01"),
+      idEmploye: '',
+      dateNaissance: new Date("2000-01-01")
     });
   }
 
@@ -111,9 +128,12 @@ export class LivreursComponent {
         photoURL: livreur.photoURL || '',
         aPermis: livreur.aPermis,
         email: livreur.email,
-        // Vous pourriez avoir besoin d'une conversion ici si l'objet Entrepot doit être affiché différemment.
-        entrepot: (livreur.entrepot as any)?.toString() || '',
-        status: livreur.affecte ? 'affecté' : 'nonAffecté'
+        entrepot: livreur.entrepot,
+        disponibilite: livreur.disponibilite,
+        dateExpirationPermis: livreur.dateExpirationPermis,
+        idEmploye: livreur.idEmploye,
+        dateNaissance: livreur.dateNaissance,
+        affecte: livreur.affecte
       });
       this.editingLivreurId.set(id);
       this.showModal.set(true);
@@ -134,9 +154,9 @@ export class LivreursComponent {
         email: this.livreurForm().email,
         entrepot: this.livreurForm().entrepot as any,
         disponibilite: {} as any, // Remplacez par la valeur réelle de l'agenda si nécessaire.
-        dateExpirationPermis: new Date(), // Remplacez par la date réelle d'expiration.
-        dateNaissance: new Date(), // Remplacez par la date réelle de naissance.
-        affecte: this.livreurForm().status === 'affecté'
+        dateExpirationPermis: new Date("2000-01-01"), // Remplacez par la date réelle d'expiration.
+        dateNaissance: new Date("2000-01-01"), // Remplacez par la date réelle de naissance.
+        affecte: this.livreurForm().affecte
       };
 
       // Mettre à jour la liste des livreurs
@@ -164,8 +184,15 @@ export class LivreursComponent {
         photoURL: '',
         aPermis: true,
         email: '',
-        entrepot: '',
-        status: 'nonAffecté'
+        affecte: false,
+        entrepot: dummyEntrepot('blabla'),
+        disponibilite: {
+          idAgenda: '',
+          creneaux: []
+        },
+        dateExpirationPermis: new Date("2000-01-01"),
+        idEmploye: '',
+        dateNaissance: new Date("2000-01-01")
       });
     }
   }
@@ -187,8 +214,15 @@ export class LivreursComponent {
       photoURL: '',
       aPermis: true,
       email: '',
-      entrepot: '',
-      status: 'nonAffecté'
+      affecte: false,
+      entrepot: dummyEntrepot('blabla'),
+      disponibilite: {
+        idAgenda: '',
+        creneaux: []
+      },
+      dateExpirationPermis: new Date("2000-01-01"),
+      idEmploye: '',
+      dateNaissance: new Date("2000-01-01")
     });
   }
 

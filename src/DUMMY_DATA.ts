@@ -6,7 +6,7 @@ import { Livreur } from "./models/interfaces/livreur.model";
 
 // Helper functions for dummy objects
 const dummyAgenda = (id: string) => ({ idAgenda: id, creneaux: [] });
-const dummyEntrepot = (nom: string) => ({ nom });
+export const dummyEntrepot = (nom: string) => ({ nom });
 const dummyTournee = (num: number, dateStr: string) => ({
   numTournee: num,
   date: new Date(dateStr),

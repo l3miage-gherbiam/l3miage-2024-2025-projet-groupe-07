@@ -19,6 +19,7 @@ import { commandesExemple,equipesLivreursExample } from '../DUMMY_DATA';
 
 import { EquipeLivreurs } from '../models/interfaces/equipe-livreurs.model';
 import { Commande } from '../models/interfaces/commande.model';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -29,6 +30,7 @@ import { Commande } from '../models/interfaces/commande.model';
     // MapComponent,
     HeaderComponent,
     RouterModule,
+    HttpClientModule,
     // TourneesComponent,
     MatSlideToggleModule,
     // TableauDeBordComponent,
