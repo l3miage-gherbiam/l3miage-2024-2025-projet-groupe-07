@@ -32,7 +32,8 @@ export const livreursExemple: Livreur[] = [
     disponibilite: dummyAgenda("agenda_jdd1"),
     dateExpirationPermis: dummyExpiration,
     entrepot: dummyEntrepot("Grenis"),
-    affecte: true
+    affecte: true,
+    aPermis: true
   },
   {
     idEmploye: "jdd2",
@@ -45,7 +46,8 @@ export const livreursExemple: Livreur[] = [
     disponibilite: dummyAgenda("agenda_jdd2"),
     dateExpirationPermis: dummyExpiration,
     entrepot: dummyEntrepot("Grenis"),
-    affecte: false
+    affecte: false,
+    aPermis: true
   },
   {
     idEmploye: "jdd3",
@@ -58,7 +60,8 @@ export const livreursExemple: Livreur[] = [
     disponibilite: dummyAgenda("agenda_jdd3"),
     dateExpirationPermis: dummyExpiration,
     entrepot: dummyEntrepot("Grenis"),
-    affecte: true
+    affecte: true,
+    aPermis: true
   },
   {
     idEmploye: "jdd4",
@@ -71,7 +74,8 @@ export const livreursExemple: Livreur[] = [
     disponibilite: dummyAgenda("agenda_jdd4"),
     dateExpirationPermis: dummyExpiration,
     entrepot: dummyEntrepot("Grenis"),
-    affecte: false
+    affecte: false,
+    aPermis: true
   },
   {
     idEmploye: "jdd5",
@@ -84,7 +88,8 @@ export const livreursExemple: Livreur[] = [
     disponibilite: dummyAgenda("agenda_jdd5"),
     dateExpirationPermis: dummyExpiration,
     entrepot: dummyEntrepot("Grenis"),
-    affecte: true
+    affecte: true,
+    aPermis: true
   },
   {
     idEmploye: "jdd6",
@@ -97,7 +102,8 @@ export const livreursExemple: Livreur[] = [
     disponibilite: dummyAgenda("agenda_jdd6"),
     dateExpirationPermis: dummyExpiration,
     entrepot: dummyEntrepot("Grenis"),
-    affecte: false
+    affecte: false,
+    aPermis: true
   }
 ];
 
@@ -127,12 +133,7 @@ export const equipesLivreursExample: EquipeLivreurs[] = [
   }
 ];
 
-/**
- * Dummy list of Commande
- * Note: We replace "id" with "reference". The client objects now include an 'adresse'
- * object (instead of a plain string) and omit the extra "etat" field.
- * Where a commande is linked to a tournee, we provide a dummy Tournee object.
- */
+
 export const commandesExemple: Commande[] = [
   {
     reference: "c001",

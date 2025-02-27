@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { Livreur } from '../../../models/interfaces/livreur.model';
+import { BackendCommunicationService } from '../../services/backendCommunication.service';
 // Note: Import Agenda and Entrepot if needed for proper typing of default values.
 
 @Component({
@@ -14,6 +15,7 @@ import { Livreur } from '../../../models/interfaces/livreur.model';
 export class LivreursComponent {
 
   dataService = inject(DataService);
+  backednService = inject(BackendCommunicationService);
 
   // Liste des livreurs (utilisant un signal)
   livreurs = model.required<Livreur[]>();
@@ -29,6 +31,7 @@ export class LivreursComponent {
     prenom: string,
     telephone: string,
     photoURL: string,
+    aPermis: boolean,
     email: string,
     entrepot: string, // Ce champ est de type string dans le formulaire. Vous devrez convertir ou rechercher l'objet Entrepot approprié.
     status: "affecté" | "nonAffecté"
@@ -37,6 +40,7 @@ export class LivreursComponent {
     prenom: '',
     telephone: '',
     photoURL: '',
+    aPermis: true,
     email: '',
     entrepot: '',
     status: 'nonAffecté'
@@ -64,6 +68,7 @@ export class LivreursComponent {
       prenom: this.livreurForm().prenom,
       telephone: this.livreurForm().telephone,
       photoURL: this.livreurForm().photoURL || undefined,
+      aPermis: this.livreurForm().aPermis,
       email: this.livreurForm().email,
       // Ici, "entrepot" est récupéré depuis le formulaire comme string.
       // Vous devrez le convertir en un objet Entrepot, ou ajuster le formulaire pour le saisir correctement.
@@ -76,6 +81,8 @@ export class LivreursComponent {
     };
 
     // Ajouter le nouveau livreur à la liste
+    this.backednService.postLivreur(nouveauLivreur);
+
     this.livreurs.update(old => [...old, nouveauLivreur]);
     this.dataService.livreurs.update(old => [...old, nouveauLivreur]);
 
@@ -86,6 +93,7 @@ export class LivreursComponent {
       prenom: '',
       telephone: '',
       photoURL: '',
+      aPermis: true,
       email: '',
       entrepot: '',
       status: 'nonAffecté'
@@ -101,6 +109,7 @@ export class LivreursComponent {
         prenom: livreur.prenom,
         telephone: livreur.telephone,
         photoURL: livreur.photoURL || '',
+        aPermis: livreur.aPermis,
         email: livreur.email,
         // Vous pourriez avoir besoin d'une conversion ici si l'objet Entrepot doit être affiché différemment.
         entrepot: (livreur.entrepot as any)?.toString() || '',
@@ -121,6 +130,7 @@ export class LivreursComponent {
         prenom: this.livreurForm().prenom,
         telephone: this.livreurForm().telephone,
         photoURL: this.livreurForm().photoURL || undefined,
+        aPermis: this.livreurForm().aPermis,
         email: this.livreurForm().email,
         entrepot: this.livreurForm().entrepot as any,
         disponibilite: {} as any, // Remplacez par la valeur réelle de l'agenda si nécessaire.
@@ -152,6 +162,7 @@ export class LivreursComponent {
         prenom: '',
         telephone: '',
         photoURL: '',
+        aPermis: true,
         email: '',
         entrepot: '',
         status: 'nonAffecté'
@@ -174,6 +185,7 @@ export class LivreursComponent {
       prenom: '',
       telephone: '',
       photoURL: '',
+      aPermis: true,
       email: '',
       entrepot: '',
       status: 'nonAffecté'

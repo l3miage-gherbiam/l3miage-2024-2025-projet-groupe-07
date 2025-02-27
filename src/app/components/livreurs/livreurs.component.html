@@ -12,6 +12,7 @@
               <p class="custom-card-text"><strong>Nom : </strong>{{ item.nom }}</p>
               <p class="custom-card-text"><strong>Prénom : </strong>{{ item.prenom }}</p>
               <p class="custom-card-text"><strong>Téléphone : </strong>{{ item.telephone }}</p>
+              <p class="custom-card-text"><strong>aPermis : </strong>{{ item.aPermis }}</p>
               <p class="custom-card-text"><strong>Email : </strong>{{ item.email }}</p>
               <p class="custom-card-text"><strong>Entrepôt : </strong>{{ item.entrepot }}</p>
               <p class="custom-card-text">
@@ -59,6 +60,10 @@
           <div class="form-group mb-3">
             <label for="photoURL">Photo URL</label>
             <input type="text" id="photoURL" class="form-control" [(ngModel)]="livreurForm().photoURL" name="photoURL">
+          </div>
+          <div class="form-group mb-3">
+            <label for="photoURL">aPermis</label>
+            <input type="text" id="photoURL" class="form-control" [(ngModel)]="livreurForm().aPermis" name="aPermis">
           </div>
           <div class="form-group mb-3">
             <label for="email">Email</label>
