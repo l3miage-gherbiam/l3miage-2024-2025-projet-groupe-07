@@ -13,8 +13,6 @@ import { dummyEntrepot } from '../../../DUMMY_DATA';
 })
 export class LivreursComponent {
 
-  // button modifier ne marche pas encore
-
 
   backendService = inject(BackendCommunicationService);
   livreurs = model.required<Livreur[]>();
@@ -49,7 +47,7 @@ export class LivreursComponent {
     this.backendService.getLivreurs().subscribe({
       next: (res) => {
         if (res && Array.isArray(res)) {
-          this.livreurs.set(res);
+          this.livreurs.set(res.sort((a, b) => a.idEmploye.localeCompare(b.idEmploye)));
         } else {
           console.error("Réponse invalide de getLivreurs :", res);
         }
@@ -129,7 +127,13 @@ export class LivreursComponent {
     const id = this.editingLivreurId();
     if (id) {
       const livreurModifie = this.getLivreurFromForm(id);
-      this.livreurs.update(old => old.map(l => l.idEmploye === id ? livreurModifie : l));
+      this.backendService.putLivreur(livreurModifie).subscribe({
+        next: (res: any) => { console.log("Livreur modifié avec succès :", res); 
+          this.livreurs.update(old => old.map(l => l.idEmploye === id ? livreurModifie : l));
+        },
+        error: (err) => { console.error("Erreur lors de la modification du livreur :", err); }
+      });
+      console.log("Livreur modifié :", livreurModifie);
       this.showModal.set(false);
       this.editingLivreurId.set(null);
       this.resetLivreurForm();

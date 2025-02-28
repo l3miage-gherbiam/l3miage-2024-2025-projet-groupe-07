@@ -90,12 +90,22 @@ export class BackendCommunicationService {
   //   return this.http.post<EquipeLivreurs>("http://localhost:8080/api/equipes", equipeLivreur).pipe(catchError(this.handleError))
   // }
 
-  deleteEquipeLivreur(id : number) : Observable<any> {
-    return this.http.delete(`http://localhost:8080/api/equipes/${id}`).pipe(catchError(this.handleError))
+  updateEquipeLivreur(numEquipe: number, livreurs: Livreur[]): Observable<any> {
+    const dto = {
+      numEquipe: numEquipe,
+      status: StatusEquipeLivreurs.PRET,
+      livreurs: livreurs,
+      agenda: null
+    };
+    return this.http.put<EquipeLivreursDTO>(
+      `http://localhost:8080/api/equipes/${numEquipe}`, 
+      dto
+    ).pipe(catchError(this.handleError));
   }
-
-  updateEquipeLivreur(equipeLivreur : EquipeLivreurs) : Observable<any> {
-    return this.http.put<EquipeLivreurs>(`http://localhost:8080/api/equipes/${equipeLivreur.numEquipe}`, equipeLivreur).pipe(catchError(this.handleError))
+  
+  deleteEquipeLivreur(id: number): Observable<any> {
+    return this.http.delete(`http://localhost:8080/api/equipes/${id}`)
+      .pipe(catchError(this.handleError));
   }
 
 

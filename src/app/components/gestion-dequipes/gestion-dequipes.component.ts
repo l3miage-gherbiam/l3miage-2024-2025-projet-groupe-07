@@ -16,8 +16,6 @@ import { BackendCommunicationService } from '../../services/backendCommunication
 })
 export class GestionDequipesComponent {
 
-  // button modifier et supprimer ne marchent pas encore
-
   private backendService = inject(BackendCommunicationService);
 
   equipeLivreurs = model.required<EquipeLivreurs[]>();
@@ -130,44 +128,73 @@ export class GestionDequipesComponent {
   enregistrerModification(): void {
     const numEquipe = this.editingEquipeId();
     if (numEquipe === null) return;
-
+  
     const form = this.equipeForm();
-    const equipeModifiee: EquipeLivreurs = {
-      numEquipe,
-      status: form.status,
-      livreurs: []
-    };
-
-    this.backendService.updateEquipeLivreur(equipeModifiee).subscribe({
+    const equipeActuelle = this.equipeLivreurs().find(e => e.numEquipe === numEquipe);
+    
+    if (!equipeActuelle) return;
+  
+    equipeActuelle.livreurs.forEach(livreur => {
+      this.backendService.putLivreur({ ...livreur, affecte: false }).subscribe();
+    });
+  
+    const selectedLivreurs = this.livreursDispos().filter(l =>
+      [form.livreur1, form.livreur2].includes(l.idEmploye)
+    );
+  
+    selectedLivreurs.forEach(livreur => {
+      this.backendService.putLivreur({ ...livreur, affecte: true }).subscribe();
+    });
+  
+    this.backendService.updateEquipeLivreur(numEquipe, selectedLivreurs).subscribe({
       next: (res) => {
         if (res) {
-          const updated = res.data || equipeModifiee;
           this.equipeLivreurs.update(old =>
-            old.map(eq => eq.numEquipe === numEquipe ? updated : eq)
+            old.map(eq => eq.numEquipe === numEquipe ? {
+              ...eq,
+              livreurs: selectedLivreurs,
+              status: form.status
+            } : eq)
           );
           this.showModal.set(false);
           this.editingEquipeId.set(null);
           this.equipeForm.set(this.getDefaultEquipeForm());
         }
       },
-      error: (err) => console.error('Erreur lors de la mise à jour de l\'équipe:', err),
-      complete: () => {
-        this.showModal.set(false);
-        this.editingEquipeId.set(null);
-        this.equipeForm.set(this.getDefaultEquipeForm());
-      }
+      error: (err) => console.error('Erreur lors de la mise à jour de l\'équipe:', err)
     });
   }
-
+  
   supprimerEquipe(numEquipe: number): void {
     if (!confirm(`Voulez-vous vraiment supprimer l'équipe #${numEquipe} ?`)) return;
-
-    this.backendService.deleteEquipeLivreur(numEquipe).subscribe({
-      next: () => {
-        this.equipeLivreurs.update(old => old.filter(e => e.numEquipe !== numEquipe));
-      },
-      error: (err) => console.error('Erreur lors de la suppression de l\'équipe:', err)
-    });
+  
+    const equipe = this.equipeLivreurs().find(e => e.numEquipe === numEquipe);
+    if (!equipe) {
+      console.error('Équipe non trouvée');
+      return;
+    }
+  
+    const updatePromises = equipe.livreurs.map(livreur =>
+      this.backendService.putLivreur({ ...livreur, affecte: false }).toPromise()
+    );
+  
+    Promise.all(updatePromises)
+      .then(() => {
+        this.backendService.deleteEquipeLivreur(numEquipe).subscribe({
+          next: () => {
+            this.equipeLivreurs.update(old => 
+              old.filter(e => e.numEquipe !== numEquipe)
+            );
+            console.log(`Équipe ${numEquipe} supprimée avec succès`);
+          },
+          error: (err) => {
+            console.error('Erreur lors de la suppression de l\'équipe:', err);
+          }
+        });
+      })
+      .catch(err => {
+        console.error('Erreur lors de la mise à jour des statuts des livreurs:', err);
+      });
   }
 
   annulerCreation(): void {
