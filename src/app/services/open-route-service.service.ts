@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GeoJSON,LatLng } from 'leaflet';
 import { EquipeLivreurs } from '../../models/interfaces/equipe-livreurs.model';
+import { Commande } from '../../models/interfaces/schemas/commande.schema';
 
 @Injectable({
   providedIn: 'root'
@@ -102,7 +103,7 @@ export class OpenRouteServiceService {
     let vehicles = [];
     for(let equipe of availableEquipes){
       vehicles.push({
-        id: id,
+        id: equipe.numEquipe,
         profile: 'driving-car',
         start: [entrepot.lng, entrepot.lat],
         end: [entrepot.lng, entrepot.lat],
@@ -115,6 +116,60 @@ export class OpenRouteServiceService {
     const jobs = latlngTable.slice(1).map((point, index) => ({
       id: index + 1,
       location: [point.lng, point.lat],
+      amount: [1]
+    }));
+
+    const body = {
+      vehicles,
+      jobs,
+      geometry: true
+    };
+
+    try {
+      const fetchResponse = await fetch(
+        "https://api.openrouteservice.org/optimization",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: this.apiKey
+          },
+          body: JSON.stringify(body)
+        }
+      );
+      if (!fetchResponse.ok) {
+        console.error('Erreur', fetchResponse.statusText);
+        return;
+      }
+      const data = await fetchResponse.json();
+      console.log('data',data);
+      return data;
+    }
+    catch (error) {
+      console.error('Erreur', error);
+      return;
+    }
+  }
+
+  async getOptimizationAutmatique2(commandes: Commande[],availableEquipes: EquipeLivreurs[],entrepot: LatLng): Promise<any> {
+
+    // latlngTable = [point1, point2, point3, ...] (commandes )
+    // let id = 1;
+    let vehicles = [];
+    for(let equipe of availableEquipes){
+      vehicles.push({
+        id: equipe.numEquipe,
+        profile: 'driving-car',
+        start: [entrepot.lng, entrepot.lat],
+        end: [entrepot.lng, entrepot.lat],
+        capacity: [Math.floor(commandes.length/availableEquipes.length)+1]
+      });
+    }
+    console.log('vehicles',vehicles);
+
+    const jobs = commandes.map((commande, index) => ({
+      id: commande.reference,
+      location: [commande.client.adresse.longitude, commande.client.adresse.latitude],
       amount: [1]
     }));
 
