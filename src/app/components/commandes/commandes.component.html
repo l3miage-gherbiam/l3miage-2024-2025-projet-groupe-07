@@ -1,108 +1,171 @@
 <table class="table custom-table">
   <thead>
     <tr>
-      <th scope="col" (click)="sortBy('id')">
-        ID
-        @if (sortColumn === 'id') {
-          <span class="sort-indicator">
-            {{ sortDirection === 'asc' ? '▲' : '▼' }}
-          </span>
-        }
-      </th>
-      <th scope="col" (click)="sortBy('date')">
-        Date
-        @if (sortColumn === 'date') {
-          <span class="sort-indicator">
-            {{ sortDirection === 'asc' ? '▲' : '▼' }}
-          </span>
-        }
-      </th>
-      <th scope="col" (click)="sortBy('client')">
-        Client
-        @if (sortColumn === 'client') {
-          <span class="sort-indicator">
-            {{ sortDirection === 'asc' ? '▲' : '▼' }}
-          </span>
-        }
-      </th>
-      <th scope="col" (click)="sortBy('adresse')">
-        Adresse
-        @if (sortColumn === 'adresse') {
-          <span class="sort-indicator">
-            {{ sortDirection === 'asc' ? '▲' : '▼' }}
-          </span>
-        }
-      </th>
-      <th scope="col" (click)="sortBy('datecommandeestime')">
-        Date de commande estimée
-        @if (sortColumn === 'datecommandeestime') {
-          <span class="sort-indicator">
-            {{ sortDirection === 'asc' ? '▲' : '▼' }}
-          </span>
-        }
-      </th>
-      <th scope="col" (click)="sortBy('horairePreferable')">
-        Horaire Préférable
-        @if (sortColumn === 'horairePreferable') {
-          <span class="sort-indicator">
-            {{ sortDirection === 'asc' ? '▲' : '▼' }}
-          </span>
-        }
-      </th>
-      <th scope="col" (click)="sortBy('dateLivre')">
-        Date Estimée
-        @if (sortColumn === 'dateLivraisonEstimee') {
-          <span class="sort-indicator">
-            {{ sortDirection === 'asc' ? '▲' : '▼' }}
-          </span>
-        }
-      </th>
-      <th scope="col" (click)="sortBy('dateLivre')">
-        Date Livré
-        @if (sortColumn === 'dateLivre') {
-          <span class="sort-indicator">
-            {{ sortDirection === 'asc' ? '▲' : '▼' }}
-          </span>
-        }
-      </th>
-      <th scope="col" (click)="sortBy('etat')">
-        Statut
-        @if (sortColumn === 'etat') {
-          <span class="sort-indicator">
-            {{ sortDirection === 'asc' ? '▲' : '▼' }}
-          </span>
-        }
-      </th>
+      <th scope="col" (click)="sortBy('reference')">Reference</th>
+      <th scope="col" (click)="sortBy('date')">Date</th>
+      <th scope="col" (click)="sortBy('client')">Client</th>
+      <th scope="col" (click)="sortBy('adresse')">Adresse</th>
+      <th scope="col" (click)="sortBy('dateEstimee')">Date commande estimée</th>
+      <th scope="col" (click)="sortBy('horairePreferable')">Horaire Préférable</th>
+      <th scope="col" (click)="sortBy('dateLivre')">Date Livré</th>
+      <th scope="col" (click)="sortBy('etat')">Statut</th>
       <th scope="col">Actions</th>
     </tr>
   </thead>
   <tbody>
     @for (item of sortedCommandes(); track $index) {
       <tr>
-        <td scope="row">{{ item.reference }}</td>
-        <td>{{ item.date }}</td>
-        <td>{{ item.client.prenom }} {{ item.client.nom }}</td>
-        <td>
-          {{ this.adresseGouvService.createAddressString(item.client.adresse) }}
+        <td>{{ item.reference }}</td>
+        <td>{{ item.date | date: 'fullDate' }}</td>
+        <td class="clickable" (click)="voirDetailClient(item.client)">
+          {{ item.client.prenom }} {{ item.client.nom }}
         </td>
-        <td>{{ item.dateLivraisonEstimee }}</td>
-        <td>{{ item.horairePreferable }}</td>
-        <td>{{ item.dateLivre }}</td>
-        <td>{{ item.dateLivraisonEstimee }}</td>
+        <td class="clickable" (click)="voirDetailAdresse(item.client.adresse)">
+          {{ adresseGouvService.createAddressString(item.client.adresse) }}
+        </td>
+        
+        <td>{{ item.dateLivraisonEstimee | date: 'fullDate' }}</td>
+        <td>{{ item.horairePreferable | date: 'shortTime' }}</td>
+        <td>{{ item.dateLivre | date: 'fullDate' }}</td>
         <td>
           <span [ngClass]="{
               'custom-status-EN_LIVRAISON': item.etat === EtatCommande.EN_LIVRAISON,
               'custom-status-PLANIFIEE': item.etat === EtatCommande.PLANIFIEE,
               'custom-status-LIVREE': item.etat === EtatCommande.LIVREE,
               'custom-status-OUVERTE': item.etat === EtatCommande.OUVERTE
-            }" class="custom-status">
+            }">
             {{ item.etat }}
           </span>
         </td>
         <td>
-          <button class="custom-action-btn modify">Modifier</button>
+          <button (click)="modifierCommande(item.reference)">Modifier</button>
         </td>
       </tr>
     }
   </tbody>
 </table>
+
+@if (showEditModal()) {
+  <div class="modal">
+    <div class="modal-content">
+      <h2>Modifier Commande {{ commandeForm().reference }}</h2>
+      
+      <!-- Onglets -->
+      <div class="tabs">
+        <span class="tab" [class.active]="selectedTab() === 'dates'" (click)="selectedTab.set('dates')">Dates</span>
+        <span class="tab" [class.active]="selectedTab() === 'client'" (click)="selectedTab.set('client')">Client</span>
+        <span class="tab" [class.active]="selectedTab() === 'adresse'" (click)="selectedTab.set('adresse')">Adresse</span>
+      </div>
+      
+      <form (ngSubmit)="enregistrerModification()">
+        <!-- Onglet Dates -->
+        @if (selectedTab() === 'dates') {
+          <fieldset>
+            <legend>Dates de livraison</legend>
+            <label>
+              Date de commande:
+              <input type="datetime-local" [(ngModel)]="commandeForm().date" name="date" />
+            </label>
+            <label>
+              Horaire Préférable:
+              <input type="datetime-local" [(ngModel)]="commandeForm().horairePreferable" name="horairePreferable" />
+            </label>
+            <label>
+              Date Livraison Estimée:
+              <input type="datetime-local" [(ngModel)]="commandeForm().dateLivraisonEstimee" name="dateLivraisonEstimee" />
+            </label>
+            <label>
+              Date Livré:
+              <input type="datetime-local" [(ngModel)]="commandeForm().dateLivre" name="dateLivre" />
+            </label>
+          </fieldset>
+        }
+        
+        <!-- Onglet Client -->
+        @if (selectedTab() === 'client') {
+          <fieldset>
+            <legend>Informations Client</legend>
+            <label>
+              Prénom:
+              <input type="text" [(ngModel)]="commandeForm().client.prenom" name="clientPrenom" />
+            </label>
+            <label>
+              Nom:
+              <input type="text" [(ngModel)]="commandeForm().client.nom" name="clientNom" />
+            </label>
+            <label>
+              Email:
+              <input type="email" [(ngModel)]="commandeForm().client.email" name="clientEmail" />
+            </label>
+            <label>
+              Téléphone:
+              <input type="text" [(ngModel)]="commandeForm().client.telephone" name="clientTelephone" />
+            </label>
+          </fieldset>
+        }
+        
+        <!-- Onglet Adresse -->
+        @if (selectedTab() === 'adresse') {
+          <fieldset>
+            <legend>Informations Adresse</legend>
+            <label>
+              Adresse Postal:
+              <input type="text" [(ngModel)]="commandeForm().client.adresse.adressePostal" name="adressePostal" />
+            </label>
+            <label>
+              Complément:
+              <input type="text" [(ngModel)]="commandeForm().client.adresse.complementAdresse" name="complementAdresse" />
+            </label>
+            <label>
+              Ville:
+              <input type="text" [(ngModel)]="commandeForm().client.adresse.ville" name="ville" />
+            </label>
+            <label>
+              Code Postal:
+              <input type="number" [(ngModel)]="commandeForm().client.adresse.codePostal" name="codePostal" />
+            </label>
+            <label>
+              Latitude:
+              <input type="number" [(ngModel)]="commandeForm().client.adresse.latitude" name="latitude" />
+            </label>
+            <label>
+              Longitude:
+              <input type="number" [(ngModel)]="commandeForm().client.adresse.longitude" name="longitude" />
+            </label>
+          </fieldset>
+        }
+        <button type="submit">Enregistrer</button>
+        <button type="button" (click)="annulerModification()">Annuler</button>
+      </form>
+    </div>
+  </div>
+}
+
+@if (showClientModal()) {
+  <div class="modal">
+    <div class="modal-content">
+      <h2>Informations Client</h2>
+      <p><strong>Code :</strong> {{ clientDetail().code }}</p>
+      <p><strong>Email :</strong> {{ clientDetail().email }}</p>
+      <p><strong>Prénom :</strong> {{ clientDetail().prenom }}</p>
+      <p><strong>Nom :</strong> {{ clientDetail().nom }}</p>
+      <p><strong>Téléphone :</strong> {{ clientDetail().telephone }}</p>
+      <button (click)="closeClientModal()">Fermer</button>
+    </div>
+  </div>
+}
+
+@if (showAdresseModal()) {
+  <div class="modal">
+    <div class="modal-content">
+      <h2>Informations Adresse</h2>
+      <p><strong>Adresse Postal :</strong> {{ adresseDetail().adressePostal }}</p>
+      <p><strong>Complément :</strong> {{ adresseDetail().complementAdresse }}</p>
+      <p><strong>Ville :</strong> {{ adresseDetail().ville }}</p>
+      <p><strong>Code Postal :</strong> {{ adresseDetail().codePostal }}</p>
+      <p><strong>Latitude :</strong> {{ adresseDetail().latitude }}</p>
+      <p><strong>Longitude :</strong> {{ adresseDetail().longitude }}</p>
+      <button (click)="closeAdresseModal()">Fermer</button>
+    </div>
+  </div>
+}

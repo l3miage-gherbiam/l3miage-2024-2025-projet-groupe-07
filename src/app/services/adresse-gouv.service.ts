@@ -21,6 +21,9 @@ export class AdresseGouvService {
   constructor() { }
 
   createAddressString(adresse: Adresse): string {
+    if (adresse.complementAdresse === null) {
+      return `${adresse.adressePostal} ${adresse.ville} ${adresse.codePostal}`
+    }
     return `${adresse.adressePostal} ${adresse.complementAdresse} ${adresse.ville} ${adresse.codePostal}`;
   }
 

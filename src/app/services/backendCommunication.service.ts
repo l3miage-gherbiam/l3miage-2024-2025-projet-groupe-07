@@ -8,6 +8,7 @@ import { EquipeLivreurs } from '../../models/interfaces/schemas/equipe-livreurs.
 import { StatusEquipeLivreurs } from '../../models/enums/status-equipe-livreurs.enum';
 import { Agenda } from '../../models/interfaces/schemas/agenda.schema';
 import { map } from 'rxjs/operators';
+import { Commande } from '../../models/interfaces/commande.model';
 
 // import { TourneeDetailed } from '../../models/tourneeDetailed.model';
 
@@ -106,6 +107,16 @@ export class BackendCommunicationService {
   deleteEquipeLivreur(id: number): Observable<any> {
     return this.http.delete(`http://localhost:8080/api/equipes/${id}`)
       .pipe(catchError(this.handleError));
+  }
+
+  // Commande
+
+  getCommandes() : Observable<any> {
+    return this.http.get("http://localhost:8080/api/commandes").pipe(catchError(this.handleError))
+  }
+
+  putCommande(commande : Commande) : Observable<any> {
+    return this.http.put<Commande>(`http://localhost:8080/api/commandes/${commande.reference}`, commande).pipe(catchError(this.handleError))
   }
 
 
