@@ -4,7 +4,7 @@ import { Entrepot } from './entrepot.model';
 export interface Livreur extends Employe {
   disponibilite?: Agenda;
   dateExpirationPermis?: Date;
-  aPermis: boolean;
+  apermis: boolean;
   affecte: boolean;
   entrepot?: Entrepot;
 }

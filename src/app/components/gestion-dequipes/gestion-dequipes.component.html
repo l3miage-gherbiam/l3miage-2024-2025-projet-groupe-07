@@ -24,17 +24,18 @@
               <li>{{ item.livreurs[1].nom }} {{ item.livreurs[1].prenom }}</li>
             </ul>
             <div class="custom-actions mt-auto">
-  <button class="custom-btn custom-btn-primary btn-sm" (click)="modifierEquipe(item.numEquipe!)">Modifier</button>
-  <button class="custom-btn custom-btn-danger btn-sm" (click)="supprimerEquipe(item.numEquipe!)">Supprimer</button>
-</div>
+              <button class="custom-btn custom-btn-primary btn-sm" (click)="modifierEquipe(item.numEquipe!)">Modifier</button>
+              <button class="custom-btn custom-btn-danger btn-sm" (click)="supprimerEquipe(item.numEquipe!)">Supprimer</button>
+            </div>
           </div>
         </div>
       </div>
     }
   </div>
 </div>
+
 @if (showModal()){
-<div class="modal-overlay" >
+<div class="modal-overlay">
   <div class="modal-content">
     <div class="modal-header">
       <h2>{{ editingEquipeId() ? 'Modifier une équipe' : 'Créer une nouvelle équipe' }}</h2>
@@ -46,25 +47,23 @@
         <div class="form-group mb-3">
           <label for="livreur1">Sélectionnez le premier livreur</label>
           <select id="livreur1" class="form-control" [(ngModel)]="equipeForm().livreur1" name="livreur1">
-            @for (l of availableLivreurs(); track $index) {
+            @for (l of livreursDispos(); track $index) {
             <option [value]="l.idEmploye">
               {{ l.prenom }} {{ l.nom }}
             </option>
-          }
+            }
           </select>
         </div>
         <div class="form-group mb-3">
           <label for="livreur2">Sélectionnez le second livreur</label>
           <select id="livreur2" class="form-control" [(ngModel)]="equipeForm().livreur2" name="livreur2">
-            @for (l of availableLivreurs(); track $index) {
+            @for (l of livreursDispos(); track $index) {
             <option [value]="l.idEmploye">
               {{ l.prenom }} {{ l.nom }}
             </option>
-          }
+            }
           </select>
         </div>
-        <div class="form-group mb-3">
-            </div>
         <div class="form-group mb-3">
           <label for="status">Statut</label>
           <select id="status" class="form-control" [(ngModel)]="equipeForm().status" name="status">

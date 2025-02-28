@@ -5,7 +5,7 @@ import { AgendaSchema } from "./agenda.schema";
 export const LivreurSchema = EmployeSchema.extend({
   disponibilite: AgendaSchema,
   dateExpirationPermis: z.date().optional(),
-  aPermis: z.boolean(),
+  apermis: z.boolean(),
   affecte: z.boolean().optional(),
   entrepot: z.any().optional(),
 });

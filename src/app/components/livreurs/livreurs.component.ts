@@ -1,12 +1,9 @@
-import { Component, inject, model, signal } from '@angular/core';
+import { Component, inject, model, signal , OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DataService } from '../../services/data.service';
 import { Livreur } from '../../../models/interfaces/livreur.model';
 import { BackendCommunicationService } from '../../services/backendCommunication.service';
-import { HttpClientModule } from '@angular/common/http';
 import { dummyEntrepot } from '../../../DUMMY_DATA';
-// Note: Import Agenda and Entrepot if needed for proper typing of default values.
 
 @Component({
   selector: 'app-livreurs',
@@ -16,108 +13,96 @@ import { dummyEntrepot } from '../../../DUMMY_DATA';
 })
 export class LivreursComponent {
 
-  dataService = inject(DataService);
+  // button modifier ne marche pas encore
+
+
   backendService = inject(BackendCommunicationService);
-
-  // Liste des livreurs (utilisant un signal)
   livreurs = model.required<Livreur[]>();
-
-  // Gestion du modal
   showModal = signal(false);
-
-  // Formulaire pour créer ou modifier un livreur.
-  // Le champ "status" ici est utilisé pour l'affichage (avec les valeurs "affecté" / "nonAffecté")
-  // et sera converti en la propriété boolean "affecte" lors de la création/modification.
-  livreurForm = model<Livreur>({
-    nom: '',
-    prenom: '',
-    telephone: '',
-    photoURL: '',
-    aPermis: true,
-    email: '',
-    affecte: false,
-    entrepot: dummyEntrepot('blabla'),
-    disponibilite: {
-      idAgenda: '',
-      creneaux: []
-    },
-    dateExpirationPermis: new Date("2000-01-01"),
-    idEmploye: '',
-    dateNaissance: new Date("2000-01-01")
-  });
-
-  // ID du livreur en cours de modification (null si création)
   editingLivreurId = signal<string | null>(null);
 
-  constructor() {
-    // Initialisation des données
-    this.initializeData();
-  }
-
-  // Initialisation des données
-  initializeData(): void {
-    // this.backendService.getLivreurs().subscribe(
-    //   livreurs => this.livreurs.set(livreurs)
-    // );
-    this.livreurs.set(this.dataService.livreurs());
-  }
-
-  // Créer un nouveau livreur
-  creerLivreur(): void {
-    const nouveauLivreur: Livreur = {
-      idEmploye: this.genererNouvelId(),
-      nom: this.livreurForm().nom,
-      prenom: this.livreurForm().prenom,
-      telephone: this.livreurForm().telephone,
-      photoURL: this.livreurForm().photoURL || undefined,
-      aPermis: this.livreurForm().aPermis,
-      email: this.livreurForm().email,
-      // Ici, "entrepot" est récupéré depuis le formulaire comme string.
-      // Vous devrez le convertir en un objet Entrepot, ou ajuster le formulaire pour le saisir correctement.
-      entrepot: this.livreurForm().entrepot as any,
-      // Fournir des valeurs par défaut pour les propriétés requises de Livreur.
-      disponibilite: {} as any, // Remplacez ceci par une valeur par défaut appropriée pour Agenda.
-      dateExpirationPermis: new Date("2000-01-01"), // Remplacez par la date d'expiration réelle.
-      dateNaissance: new Date("2000-01-01"), // Remplacez par la date de naissance réelle.
-      affecte: this.livreurForm().affecte === true
-    };
-
-    // Ajouter le nouveau livreur à la liste
-    this.backendService.postLivreur(nouveauLivreur).subscribe({
-      next: (response) => {
-        console.log("Livreur posted:", response);
-        // Update your state or perform additional logic here.
-      },
-      error: (error) => {
-        console.error("Error posting livreur:", error);
-      }
-    });
-    // if resonse =200{
-    this.livreurs.update(old => [...old, nouveauLivreur]);
-    this.dataService.livreurs.update(old => [...old, nouveauLivreur]);
-  
-    // Fermer le modal et réinitialiser le formulaire
-    this.showModal.set(false);
-    this.livreurForm.set({
+  private getDefaultLivreurForm(): Livreur {
+    return {
       nom: '',
       prenom: '',
       telephone: '',
       photoURL: '',
-      aPermis: true,
+      apermis: true,
       email: '',
       affecte: false,
       entrepot: dummyEntrepot('blabla'),
-      disponibilite: {
-        idAgenda: '',
-        creneaux: []
-      },
-      dateExpirationPermis: new Date("2000-01-01"),
+      disponibilite: { idAgenda: '', creneaux: [] },
+      dateExpirationPermis: new Date("1970-01-01"),
       idEmploye: '',
-      dateNaissance: new Date("2000-01-01")
+      dateNaissance: new Date("1970-01-01")
+    };
+  }
+
+  livreurForm = model<Livreur>(this.getDefaultLivreurForm());
+
+  constructor() {
+    this.initializeData();
+  }
+
+
+  initializeData(): void {
+    this.backendService.getLivreurs().subscribe({
+      next: (res) => {
+        if (res && Array.isArray(res)) {
+          this.livreurs.set(res);
+        } else {
+          console.error("Réponse invalide de getLivreurs :", res);
+        }
+      },
+      error: (err) => console.error("Erreur lors de la récupération des livreurs :", err)
     });
   }
 
-  // Modifier un livreur existant
+  private resetLivreurForm(): void {
+    this.livreurForm.set(this.getDefaultLivreurForm());
+  }
+
+  private getLivreurFromForm(id?: string): Livreur {
+    return {
+      idEmploye: id ? id : this.genererNouvelId(),
+      nom: this.livreurForm().nom,
+      prenom: this.livreurForm().prenom,
+      telephone: this.livreurForm().telephone,
+      photoURL: this.livreurForm().photoURL || undefined,
+      apermis: this.livreurForm().apermis,
+      email: this.livreurForm().email,
+      entrepot: this.livreurForm().entrepot as any,
+      disponibilite: {} as any,
+      dateExpirationPermis: this.livreurForm().dateExpirationPermis,
+      dateNaissance: this.livreurForm().dateNaissance,
+      affecte: this.livreurForm().affecte
+    };
+  }
+
+  creerLivreur(): void {
+    const nouveauLivreur = this.getLivreurFromForm();
+    this.backendService.postLivreur(nouveauLivreur).subscribe({
+        next: (res: any) => {
+            if (res) {
+                console.log("Livreur posté avec succès :", res);
+                const livreurToAdd = res.data || nouveauLivreur;
+                this.livreurs.update(current => [...current, livreurToAdd]);
+                this.showModal.set(false);
+                this.resetLivreurForm();
+            } else {
+                console.error("Erreur dans la réponse du POST :", res);
+            }
+        },
+        error: (err) => {
+            console.error("Erreur lors de l'envoi du livreur :", err);
+        },
+        complete: () => {
+            this.showModal.set(false);
+            this.resetLivreurForm();
+        }
+    });
+}
+
   modifierLivreur(id: string): void {
     const livreur = this.livreurs().find(l => l.idEmploye === id);
     if (livreur) {
@@ -126,7 +111,7 @@ export class LivreursComponent {
         prenom: livreur.prenom,
         telephone: livreur.telephone,
         photoURL: livreur.photoURL || '',
-        aPermis: livreur.aPermis,
+        apermis: livreur.apermis,
         email: livreur.email,
         entrepot: livreur.entrepot,
         disponibilite: livreur.disponibilite,
@@ -140,93 +125,23 @@ export class LivreursComponent {
     }
   }
 
-  // Enregistrer les modifications d'un livreur
   enregistrerModification(): void {
     const id = this.editingLivreurId();
     if (id) {
-      const livreurModifie: Livreur = {
-        idEmploye: id,
-        nom: this.livreurForm().nom,
-        prenom: this.livreurForm().prenom,
-        telephone: this.livreurForm().telephone,
-        photoURL: this.livreurForm().photoURL || undefined,
-        aPermis: this.livreurForm().aPermis,
-        email: this.livreurForm().email,
-        entrepot: this.livreurForm().entrepot as any,
-        disponibilite: {} as any, // Remplacez par la valeur réelle de l'agenda si nécessaire.
-        dateExpirationPermis: new Date("2000-01-01"), // Remplacez par la date réelle d'expiration.
-        dateNaissance: new Date("2000-01-01"), // Remplacez par la date réelle de naissance.
-        affecte: this.livreurForm().affecte
-      };
-
-      // Mettre à jour la liste des livreurs
-      this.livreurs.update(old => old.map(livreur => {
-        if (livreur.idEmploye === id) {
-          return livreurModifie;
-        }
-        return livreur;
-      }));
-
-      this.dataService.livreurs.update(old => old.map(livreur => {
-        if (livreur.idEmploye === id) {
-          return livreurModifie;
-        }
-        return livreur;
-      }));
-
-      // Fermer le modal et réinitialiser le formulaire
+      const livreurModifie = this.getLivreurFromForm(id);
+      this.livreurs.update(old => old.map(l => l.idEmploye === id ? livreurModifie : l));
       this.showModal.set(false);
       this.editingLivreurId.set(null);
-      this.livreurForm.set({
-        nom: '',
-        prenom: '',
-        telephone: '',
-        photoURL: '',
-        aPermis: true,
-        email: '',
-        affecte: false,
-        entrepot: dummyEntrepot('blabla'),
-        disponibilite: {
-          idAgenda: '',
-          creneaux: []
-        },
-        dateExpirationPermis: new Date("2000-01-01"),
-        idEmploye: '',
-        dateNaissance: new Date("2000-01-01")
-      });
+      this.resetLivreurForm();
     }
   }
 
-  // Supprimer un livreur
-  supprimerLivreur(id: string): void {
-    this.livreurs.update(old => old.filter(livreur => livreur.idEmploye !== id));
-    this.dataService.livreurs.update(old => old.filter(livreur => livreur.idEmploye !== id));
-  }
-
-  // Annuler la création ou la modification
   annulerCreation(): void {
     this.showModal.set(false);
     this.editingLivreurId.set(null);
-    this.livreurForm.set({
-      nom: '',
-      prenom: '',
-      telephone: '',
-      photoURL: '',
-      aPermis: true,
-      email: '',
-      affecte: false,
-      entrepot: dummyEntrepot('blabla'),
-      disponibilite: {
-        idAgenda: '',
-        creneaux: []
-      },
-      dateExpirationPermis: new Date("2000-01-01"),
-      idEmploye: '',
-      dateNaissance: new Date("2000-01-01")
-    });
+    this.resetLivreurForm();
   }
 
-  // Générer un nouvel ID pour un livreur
   genererNouvelId(): string {
     let dernier = 0;
     this.livreurs().forEach(livreur => {

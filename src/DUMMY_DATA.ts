@@ -33,7 +33,7 @@ export const livreursExemple: Livreur[] = [
     dateExpirationPermis: dummyExpiration,
     entrepot: dummyEntrepot("Grenis"),
     affecte: true,
-    aPermis: true
+    apermis: true
   },
   {
     idEmploye: "jdd2",
@@ -47,7 +47,7 @@ export const livreursExemple: Livreur[] = [
     dateExpirationPermis: dummyExpiration,
     entrepot: dummyEntrepot("Grenis"),
     affecte: false,
-    aPermis: true
+    apermis: true
   },
   {
     idEmploye: "jdd3",
@@ -61,7 +61,7 @@ export const livreursExemple: Livreur[] = [
     dateExpirationPermis: dummyExpiration,
     entrepot: dummyEntrepot("Grenis"),
     affecte: true,
-    aPermis: true
+    apermis: true
   },
   {
     idEmploye: "jdd4",
@@ -75,7 +75,7 @@ export const livreursExemple: Livreur[] = [
     dateExpirationPermis: dummyExpiration,
     entrepot: dummyEntrepot("Grenis"),
     affecte: false,
-    aPermis: true
+    apermis: true
   },
   {
     idEmploye: "jdd5",
@@ -89,7 +89,7 @@ export const livreursExemple: Livreur[] = [
     dateExpirationPermis: dummyExpiration,
     entrepot: dummyEntrepot("Grenis"),
     affecte: true,
-    aPermis: true
+    apermis: true
   },
   {
     idEmploye: "jdd6",
@@ -103,7 +103,7 @@ export const livreursExemple: Livreur[] = [
     dateExpirationPermis: dummyExpiration,
     entrepot: dummyEntrepot("Grenis"),
     affecte: false,
-    aPermis: true
+    apermis: true
   }
 ];
 

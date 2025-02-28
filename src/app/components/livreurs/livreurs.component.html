@@ -8,13 +8,22 @@
         <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
           <div class="custom-card">
             <div class="custom-card-body d-flex flex-column">
+              @if (item.photoURL !== null) {
+                <img [src]="item.photoURL" alt="Photo de {{ item.nom }}" class="custom-card-img">
+              }
+              @else {
+                <img src="https://thispersondoesnotexist.com/" alt="Photo de {{ item.nom }}" class="custom-card-img">
+
+              }
               <h5 class="custom-card-header">Livreur {{ item.idEmploye }}</h5>
               <p class="custom-card-text"><strong>Nom : </strong>{{ item.nom }}</p>
               <p class="custom-card-text"><strong>Prénom : </strong>{{ item.prenom }}</p>
               <p class="custom-card-text"><strong>Téléphone : </strong>{{ item.telephone }}</p>
-              <p class="custom-card-text"><strong>aPermis : </strong>{{ item.aPermis }}</p>
+              <p class="custom-card-text"><strong>apermis : </strong>{{ item.apermis }}</p>
               <p class="custom-card-text"><strong>Email : </strong>{{ item.email }}</p>
-              <p class="custom-card-text"><strong>Entrepôt : </strong>{{ item.entrepot }}</p>
+              <p class="custom-card-text"><strong>Entrepôt : </strong>{{ item.entrepot?.nom }}</p>
+              <p class="custom-card-text"><strong>Date de Naissance : </strong>{{ item.dateNaissance }}</p>
+              <p class="custom-card-text"><strong>Date d'Expiration du Permis : </strong>{{ item.dateExpirationPermis }}</p>
               <p class="custom-card-text">
                 <strong>Statut : </strong>
                 <span [ngClass]="{
@@ -26,7 +35,7 @@
               </p>
               <div class="custom-actions mt-auto">
                 <button class="custom-btn custom-btn-primary btn-sm" (click)="modifierLivreur(item.idEmploye!)">Modifier</button>
-                <button class="custom-btn custom-btn-danger btn-sm" (click)="supprimerLivreur(item.idEmploye!)">Supprimer</button>
+                <!-- <button class="custom-btn custom-btn-danger btn-sm" (click)="supprimerLivreur(item.idEmploye!)">Supprimer</button> -->
               </div>
             </div>
           </div>
@@ -45,42 +54,70 @@
       <div class="modal-body">
         <!-- Partie du formulaire dans le modal pour la création ou la modification d'un livreur -->
         <form>
+          <!-- Personal Information -->
           <div class="form-group mb-3">
-            <label for="nom">Nom</label>
-            <input type="text" id="nom" class="form-control" [(ngModel)]="livreurForm().nom" name="nom">
+            <label for="nom">Nom <span class="text-danger">*</span></label>
+            <input type="text" id="nom" class="form-control" required [(ngModel)]="livreurForm().nom" name="nom">
           </div>
+        
           <div class="form-group mb-3">
-            <label for="prenom">Prénom</label>
-            <input type="text" id="prenom" class="form-control" [(ngModel)]="livreurForm().prenom" name="prenom">
+            <label for="prenom">Prénom <span class="text-danger">*</span></label>
+            <input type="text" id="prenom" class="form-control" required [(ngModel)]="livreurForm().prenom" name="prenom">
           </div>
+        
           <div class="form-group mb-3">
-            <label for="telephone">Téléphone</label>
-            <input type="text" id="telephone" class="form-control" [(ngModel)]="livreurForm().telephone" name="telephone">
+            <label for="dateNaissance">Date de Naissance <span class="text-danger">*</span></label>
+            <input type="date" id="dateNaissance" class="form-control" required [(ngModel)]="livreurForm().dateNaissance" name="dateNaissance">
           </div>
+        
+          <div class="form-group mb-3">
+            <label for="email">Email <span class="text-danger">*</span></label>
+            <input type="email" id="email" class="form-control" required [(ngModel)]="livreurForm().email" name="email">
+          </div>
+        
+          <div class="form-group mb-3">
+            <label for="telephone">Téléphone <span class="text-danger">*</span></label>
+            <input type="text" id="telephone" class="form-control" required [(ngModel)]="livreurForm().telephone" name="telephone">
+          </div>
+        
+          <!-- License Information -->
+          <div class="form-group mb-3">
+            <label for="apermis">A Permis <span class="text-danger">*</span></label>
+            <input type="checkbox" id="apermis" class="form-check-input" required [(ngModel)]="livreurForm().apermis" name="apermis">
+          </div>
+        
+  <div class="form-group mb-3">
+    <label for="dateExpirationPermis">
+      Date Expiration Permis 
+      @if (livreurForm().apermis) {
+        <span class="text-danger">*</span>
+      }
+    </label>
+    <input type="date" id="dateExpirationPermis" class="form-control"
+           [required]="livreurForm().apermis"
+           [(ngModel)]="livreurForm().dateExpirationPermis"
+           name="dateExpirationPermis">
+  </div>
+        
+          <!-- Additional Information -->
           <div class="form-group mb-3">
             <label for="photoURL">Photo URL</label>
             <input type="text" id="photoURL" class="form-control" [(ngModel)]="livreurForm().photoURL" name="photoURL">
           </div>
-          <div class="form-group mb-3">
-            <label for="photoURL">aPermis</label>
-            <input type="text" id="photoURL" class="form-control" [(ngModel)]="livreurForm().aPermis" name="aPermis">
-          </div>
-          <div class="form-group mb-3">
-            <label for="email">Email</label>
-            <input type="email" id="email" class="form-control" [(ngModel)]="livreurForm().email" name="email">
-          </div>
-          <div class="form-group mb-3">
+        
+          <!-- Entrepôt Selection -->
+                    <!-- <div class="form-group mb-3">
             <label for="entrepot">Entrepôt</label>
-            <input type="text" id="entrepot" class="form-control" [(ngModel)]="livreurForm().entrepot" name="entrepot">
-          </div>
-          <div class="form-group mb-3">
-            <label for="status">affecte</label>
-            <select id="status" class="form-control" [(ngModel)]="livreurForm().affecte" name="affecte">
-              <option value="affecté">Affecté</option>
-              <option value="nonAffecté">Non Affecté</option>
+            <select id="entrepot" class="form-control" [(ngModel)]="livreurForm().entrepot" name="entrepot">
+              @for (entrepot of availableEntrepots(); track $index) {}
+              <option>
+                {{ entrepot.nom }}
+              </option>
             </select>
-          </div>
-        </form>
+          </div> -->
+
+        </form>        
+        
       </div>
       <div class="modal-footer">
         <button class="custom-btn custom-btn-primary" (click)="editingLivreurId() ? enregistrerModification() : creerLivreur()">

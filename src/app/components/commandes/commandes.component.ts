@@ -11,6 +11,9 @@ import { EtatCommande } from '../../../models/enums/etat-commande.enum';
   styleUrl: './commandes.component.scss'
 })
 export class CommandesComponent {
+
+  // to be linked with backend (achraf)
+
   commandes = signal<Commande[]>([]);
 
   sortColumn: string = '';
