@@ -15,6 +15,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { DragDropSelectorComponent } from './drag-drop-selector/drag-drop-selector.component';
+import { BackendCommunicationService } from '../../services/backendCommunication.service';
+import { Tournee } from '../../../models/interfaces/tournee.model';
 // import { TourneeDetailed } from '../../../models/tourneeDetailed.model';
 // import { BackendCommunicationService } from '../../services/backendCommunication.service';
 
@@ -40,16 +42,25 @@ export class PlanificateurAutomatiqueComponent {
   selectedEquipes = signal<EquipeLivreurs[]>([]);
   selectedCommandes = signal<Commande[]>([]);
   createdTourneesSignal = signal<LatLng[][]>([]);
+  commandesOuvertes = signal<Commande[]>([]);
 
   openRouteService = inject(OpenRouteServiceService);
   adresseGouvService = inject(AdresseGouvService);
   leafletService = inject(LeafletService);
-  // backendService = inject(BackendCommunicationService);
+  backendService = inject(BackendCommunicationService);
 
   constructor(public dataService: DataService) {
+    this.dataService.isDataLoaded().subscribe(loaded => {
+      if (loaded) {
     this.equipeLivreurs.set(this.dataService.equipeLivreurs());
     this.commandes.set(this.dataService.commandes());
+    this.commandesOuvertes.set(this.commandes().filter(commande => commande.etat === 'OUVERTE'));
+    }
+  });
   }
+
+  
+  
   
 
   handleSelectionChange(selection: { livreurs: EquipeLivreurs[], commandes: Commande[] }) {
@@ -59,50 +70,57 @@ export class PlanificateurAutomatiqueComponent {
   }
 
 
-  // tourneeDetailed = computed<TourneeDetailed>(() => ({
-  //   tourneeInfo: {
-  //     commandes: this.selectedCommandes(),
-  //     idTournee: '1',
-  //   },
-  //   destinations: this.createdTourneesSignal()[0]
-  // }));
 
+// affichage des commandes non livré uniquement
+  async creerTournees(): Promise<Tournee[]> {
 
+    let tournees: Tournee[] = [];
 
-  async creerTournees() {
-
-    // create a table of LatLng for the markers of the selected commandes
-    // commandesAddressesToLatLngs(commandes: Commande[]): LatLng[]
-    const markersLatLng = await this.leafletService.commandesAddressesToLatLngs(this.selectedCommandes());
-
-
-    const optimizationResponse = await this.openRouteService.getOptimizationAutmatique(markersLatLng,this.selectedEquipes(),this.entrepot());
+    const optimizationResponse = await this.openRouteService.getOptimizationAutmatique(this.selectedCommandes(),this.selectedEquipes(),this.entrepot());
     console.log('optimizationResponse', optimizationResponse);
 
     const optimizedRoutes = optimizationResponse.routes;  
   
     let cheminsOptimise: LatLng[][] = [];
-
-
+    let numTournee = 20;
+    let j = 0;
     for(let route of optimizedRoutes){
       let cheminOptimise: LatLng[] = [];
 
-      //to continue :(
       let commandesOrderById: number[] = [];
 
       for (let i = 0; i < route.steps.length; i++) {
       const location = route.steps[i].location;
-      const commandeId = route.steps[i].id;
-      commandesOrderById.push(commandeId);
-      cheminOptimise.push(new LatLng(location[1], location[0]));
-    }
+      let commandeId = 0;
+      if (route.steps[i].id !== undefined){
+        commandeId = route.steps[i].id;
+        commandesOrderById.push(commandeId);
 
+      }
+      cheminOptimise.push(new LatLng(location[1], location[0]));
+
+
+      
+    }
+    console.log('commandesOrderById',j,commandesOrderById);
+    
+    console.log('selected equipe',j, this.selectedEquipes()[j]);
+    tournees.push({
+      date: new Date("2025-09-01"),
+      equipeLivreur: this.selectedEquipes()[j],
+      commandes: commandesOrderById.map(commandeId => this.selectedCommandes().find(commande => commande.reference === commandeId)).filter((commande): commande is Commande => commande !== undefined),
+      numTournee: numTournee++
+    }
+    );
     cheminsOptimise.push(cheminOptimise);
+    j++;
   }
   this.createdTourneesSignal.set(cheminsOptimise);
   console.log('ss',this.createdTourneesSignal());
-  // this.backendService.submitTourneeDetailed(this.tourneeDetailed());
 
+  console.log('tournees', tournees);
+
+  return tournees;
   }
 
 

@@ -12,14 +12,14 @@ import { Commande } from '../../models/interfaces/commande.model';
 
 // import { TourneeDetailed } from '../../models/tourneeDetailed.model';
 
-interface EquipeLivreursDTO {
+export interface EquipeLivreursDTO {
   numEquipe: number;
   status: string;
   livreursIds: string[];
   agenda?: Agenda;
 }
 
-interface CreateEquipeLivreursDTO {
+export interface CreateEquipeLivreursDTO {
   numEquipe: number;
   status: string;
   livreurs: Livreur[];
@@ -67,19 +67,39 @@ export class BackendCommunicationService {
     return this.http.get<EquipeLivreursDTO[]>("http://localhost:8080/api/equipes");
   }
 
-  equipeLivreursFromDTO(dto: EquipeLivreursDTO, allLivreurs: Livreur[]): EquipeLivreurs {
-    const equipeLivreurs: EquipeLivreurs = {
-      numEquipe: dto.numEquipe,
-      status: dto.status as StatusEquipeLivreurs,
-      livreurs: dto.livreursIds.map(id => allLivreurs.find(l => l.idEmploye === id)!),
-      agenda: dto.agenda
-    };
-    return equipeLivreurs;
+  equipesLivreursFromDTO(dto: EquipeLivreursDTO[], allLivreurs: Livreur[]): EquipeLivreurs[] {
+    if (!Array.isArray(dto) || !Array.isArray(allLivreurs)) {
+      console.error('Invalid input:', { dto, allLivreurs });
+      return [];
+    }
+  
+    return dto.map(equipeDTO => {
+      const livreurs = equipeDTO.livreursIds
+        .map(id => allLivreurs.find(l => l.idEmploye === id))
+        .filter((l): l is Livreur => l !== undefined); // Type guard to remove undefined
+  
+      return {
+        numEquipe: equipeDTO.numEquipe,
+        status: equipeDTO.status as StatusEquipeLivreurs,
+        livreurs: livreurs,
+        agenda: equipeDTO.agenda
+      };
+    });
   }
 
-  equipesLivreursFromDTO(dto: EquipeLivreursDTO[], allLivreurs: Livreur[]): EquipeLivreurs[] {
-    return dto.map(e => this.equipeLivreursFromDTO(e, allLivreurs));
-  }
+  // equipeLivreursFromDTO(dto: EquipeLivreursDTO, allLivreurs: Livreur[]): EquipeLivreurs {
+  //   const equipeLivreurs: EquipeLivreurs = {
+  //     numEquipe: dto.numEquipe,
+  //     status: dto.status as StatusEquipeLivreurs,
+  //     livreurs: dto.livreursIds.map(id => allLivreurs.find(l => l.idEmploye === id)!),
+  //     agenda: dto.agenda
+  //   };
+  //   return equipeLivreurs;
+  // }
+
+  // equipesLivreursFromDTO(dto: EquipeLivreursDTO[], allLivreurs: Livreur[]): EquipeLivreurs[] {
+  //   return dto.map(e => this.equipeLivreursFromDTO(e, allLivreurs));
+  // }
 
 
   postEquipeLivreur(dto: CreateEquipeLivreursDTO): Observable<any> {

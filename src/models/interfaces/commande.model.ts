@@ -4,7 +4,7 @@ import { Tournee } from './tournee.model';
 import { Entrepot } from './entrepot.model';
 
 export interface Commande {
-  reference: string;
+  reference: number;
   etat: EtatCommande;
   date?: Date;
   // date?: Date ou string;

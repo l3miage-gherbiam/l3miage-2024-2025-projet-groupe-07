@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Livreur } from '../../../models/interfaces/livreur.model';
 import { BackendCommunicationService } from '../../services/backendCommunication.service';
-import { dummyEntrepot } from '../../../DUMMY_DATA';
+import { DataService } from '../../services/data.service';
 
 @Component({
   selector: 'app-livreurs',
@@ -15,6 +15,7 @@ export class LivreursComponent {
 
 
   backendService = inject(BackendCommunicationService);
+  dataService = inject(DataService);
   livreurs = model.required<Livreur[]>();
   showModal = signal(false);
   editingLivreurId = signal<string | null>(null);
@@ -28,7 +29,9 @@ export class LivreursComponent {
       apermis: true,
       email: '',
       affecte: false,
-      entrepot: dummyEntrepot('blabla'),
+      entrepot: {
+        nom: 'entroptTest',
+      },
       disponibilite: { idAgenda: '', creneaux: [] },
       dateExpirationPermis: new Date("1970-01-01"),
       idEmploye: '',
@@ -39,22 +42,12 @@ export class LivreursComponent {
   livreurForm = model<Livreur>(this.getDefaultLivreurForm());
 
   constructor() {
-    this.initializeData();
+    this.dataService.isDataLoaded().subscribe(loaded => {
+      if (loaded) {
+    this.livreurs.set(this.dataService.livreurs());      }
+  });
   }
 
-
-  initializeData(): void {
-    this.backendService.getLivreurs().subscribe({
-      next: (res) => {
-        if (res && Array.isArray(res)) {
-          this.livreurs.set(res.sort((a, b) => a.idEmploye.localeCompare(b.idEmploye)));
-        } else {
-          console.error("Réponse invalide de getLivreurs :", res);
-        }
-      },
-      error: (err) => console.error("Erreur lors de la récupération des livreurs :", err)
-    });
-  }
 
   private resetLivreurForm(): void {
     this.livreurForm.set(this.getDefaultLivreurForm());

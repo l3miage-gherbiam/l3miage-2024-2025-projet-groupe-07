@@ -18,7 +18,6 @@ export interface Tournee {
 
   equipeLivreur: EquipeLivreurs;
 
-  clients: Client[];
-
+  clients?: Client[];
   planificateur?: Planificateur;
 }

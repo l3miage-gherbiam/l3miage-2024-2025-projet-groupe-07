@@ -5,6 +5,7 @@ import { Commande } from '../../../models/interfaces/commande.model';
 import { BackendCommunicationService } from '../../services/backendCommunication.service';
 import { AdresseGouvService } from '../../services/adresse-gouv.service';
 import { EtatCommande } from '../../../models/enums/etat-commande.enum';
+import { DataService } from '../../services/data.service';
 
 @Component({
   selector: 'app-commandes',
@@ -15,11 +16,13 @@ import { EtatCommande } from '../../../models/enums/etat-commande.enum';
 })
 export class CommandesComponent {
 
+  dataService = inject(DataService);
+
   // Signal contenant les commandes
   commandes = signal<Commande[]>([]);
   // Signal pour l'affichage du modal d'édition
   showEditModal = signal(false);
-  editingCommandeReference = signal<string | null>(null);
+  editingCommandeReference = signal<number | null>(null);
   commandeForm = model<Commande>(this.getDefaultCommandeForm());
 
   // Signaux pour afficher le modal d'information sur le client
@@ -41,12 +44,16 @@ export class CommandesComponent {
   adresseGouvService = inject(AdresseGouvService);
 
   constructor() {
-    this.initializeData();
+    this.dataService.isDataLoaded().subscribe(loaded => {
+      if (loaded) {
+        this.commandes.set(this.dataService.commandes());
+      }
+    });
   }
 
   private getDefaultCommandeForm(): Commande {
     return {
-      reference: '',
+      reference: 0,
       etat: EtatCommande.OUVERTE,
       date: new Date(),
       horairePreferable: new Date().toISOString(),
@@ -71,12 +78,6 @@ export class CommandesComponent {
       tournee: null,
       entrepot: null
     };
-  }
-
-  initializeData(): void {
-    this.backendService.getCommandes().subscribe((commandes: Commande[]) => {
-      this.commandes.set(commandes.sort((a, b) => a.reference.localeCompare(b.reference)));
-    });
   }
 
 
@@ -107,7 +108,7 @@ export class CommandesComponent {
   getFieldValue(item: Commande, column: string): any {
     switch (column) {
       case 'reference':
-        return parseInt(item.reference.replace(/[^\d]/g, ''), 10);
+        return item.reference;
       case 'date':
         return item.date || '';
       case 'client':
@@ -148,7 +149,7 @@ export class CommandesComponent {
   }
 
   // Ouvre le modal pour modifier la commande
-  modifierCommande(reference: string): void {
+  modifierCommande(reference: number): void {
     const commande = this.commandes().find(c => c.reference === reference);
     if (commande) {
       this.commandeForm.set(commande);

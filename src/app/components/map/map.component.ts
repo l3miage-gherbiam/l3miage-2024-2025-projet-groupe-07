@@ -43,14 +43,26 @@ export class MapComponent {
 
   createdTournees = model<LatLng[][]>([]); 
 
+  constructor() {
+    effect(() => {
+      this.initializeMarkers(this.commandes());
+    });
+  }
+
+  private async initializeMarkers(commandes: Commande[]) {
+    if (commandes && commandes.length > 0) {
+      this.commandesMarkers = await this.leafletService.createMarkersForAvailableCommandes(commandes);
+      console.log('commandesMarkers', this.commandesMarkers);
+      this.layers.set([...this.layersBackup(), ...this.commandesMarkers]);
+      this.layersBackup.set([...this.layers()]);
+    }
+  }
+
   async ngOnInit() {
-    this.commandesMarkers = await this.leafletService.createMarkersForAvailableCommandes(this.commandes());
-    this.layers.set([...this.layersBackup(), ...this.commandesMarkers]);
     this.layersBackup.set([...this.layers()]);
   }
 
   async ngOnChanges() {
-
     if (this.createdTournees().length) {
       console.log('createdTournees',this.createdTournees());
       this.layers.set([...this.layersBackup()]);

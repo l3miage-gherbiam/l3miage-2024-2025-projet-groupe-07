@@ -10,7 +10,7 @@ import { LivreursComponent } from './components/livreurs/livreurs.component';
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'tableau-de-bord', component: TableauDeBordComponent },
-  { path: 'livraisons', component: CommandesComponent },
+  { path: 'commandes', component: CommandesComponent },
   { path: 'livreurs', component: LivreursComponent },
   { path: 'gestion-dequipes', component: GestionDequipesComponent },
   { path: 'tournees', component: TourneesComponent }, 

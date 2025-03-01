@@ -14,12 +14,12 @@ import { HeaderComponent } from './components/header/header.component';
 import { TableauDeBordComponent } from './components/tableau-de-bord/tableau-de-bord.component';
 import { CommandesComponent } from './components/commandes/commandes.component';
 import { GestionDequipesComponent } from './components/gestion-dequipes/gestion-dequipes.component';
-import { commandesExemple,equipesLivreursExample } from '../DUMMY_DATA';
 
 
 import { EquipeLivreurs } from '../models/interfaces/equipe-livreurs.model';
 import { Commande } from '../models/interfaces/commande.model';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { DataService } from './services/data.service';
 
 @Component({
   selector: 'app-root',
@@ -44,18 +44,36 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 })
 export class AppComponent {
 
-  livraisons = signal<Commande[]>(commandesExemple);
-  equipeLivreurs = signal<EquipeLivreurs[]>(equipesLivreursExample);
+  commandes = signal<Commande[]>([]);
+  equipeLivreurs = signal<EquipeLivreurs[]>([]);
   openRouteService = inject(OpenRouteServiceService);
   adresseGouvService = inject(AdresseGouvService);
-
+  dataService = inject(DataService);
   entrepot = signal<LatLng>(latLng(45.1485200, 5.7369725));
 
 
-  clients = computed(() => this.livraisons().map((livraison) => livraison.client));
+  // constructor() {
+  //   this.dataService.isDataLoaded().subscribe(loaded => {
+  //     if (loaded) {
+  //       this.commandes.set(this.dataService.commandes());
+  //       this.equipeLivreurs.set(this.dataService.equipeLivreurs());
 
-  // async ngOnInit() {
-  //   this.validateAdresses(this.clients());
+  //       // this.validateAddresses();
+
+  //     }
+  //   });
+  // }
+
+  // private async validateAddresses(): Promise<void> {
+  //   try {
+  //     const addresses = this.commandes().map(c => c.client.adresse);
+  //     console.log('Addresses to validate:', addresses);
+      
+  //     const newAddresses = await this.adresseGouvService.validateAdresses(addresses);
+  //     console.log('Validated addresses:', newAddresses);
+  //   } catch (error) {
+  //     console.error('Error validating addresses:', error);
+  //   }
   // }
 
 

@@ -6,6 +6,7 @@ import { EquipeLivreurs } from '../../../models/interfaces/equipe-livreurs.model
 import { Livreur } from '../../../models/interfaces/livreur.model';
 import { StatusEquipeLivreurs } from '../../../models/enums/status-equipe-livreurs.enum';
 import { BackendCommunicationService } from '../../services/backendCommunication.service';
+import { DataService } from '../../services/data.service';
 
 @Component({
   selector: 'app-gestion-dequipes',
@@ -17,8 +18,10 @@ import { BackendCommunicationService } from '../../services/backendCommunication
 export class GestionDequipesComponent {
 
   private backendService = inject(BackendCommunicationService);
+  dataService = inject(DataService);
 
   equipeLivreurs = model.required<EquipeLivreurs[]>();
+  livreurs = model<Livreur[]>([]);
   livreursDispos = model<Livreur[]>([]);
 
   showModal = signal(false);
@@ -34,8 +37,11 @@ export class GestionDequipesComponent {
 
   constructor() {
     this.initializeData();
+    // this.equipeLivreurs.set(this.dataService.equipeLivreurs());
+    // this.livreurs.set(this.dataService.livreurs());
   }
 
+  
   private initializeData(): void {
     this.backendService.getLivreurs().subscribe({
       next: (livreurs) => {
