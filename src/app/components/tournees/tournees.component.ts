@@ -1,7 +1,10 @@
 import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../../services/data.service';
-import { Tournee } from '../../../models/interfaces/tournee.model';
+import { Tournee, TourneeDTO } from '../../../models/interfaces/tournee.model';
+import { BackendCommunicationService } from '../../services/backendCommunication.service';
+import { EquipeLivreurs } from '../../../models/interfaces/equipe-livreurs.model';
+import { Commande } from '../../../models/interfaces/commande.model';
 
 @Component({
   selector: 'app-tournees',
@@ -12,6 +15,9 @@ import { Tournee } from '../../../models/interfaces/tournee.model';
 })
 export class TourneesComponent {
   tournees = signal<Tournee[]>([]);
+  backendService = inject(BackendCommunicationService);
+  commandes = signal<Commande[]>([]);
+  equipeLivreurs = signal<EquipeLivreurs[]>([]);
 
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
@@ -19,11 +25,27 @@ export class TourneesComponent {
   dataService = inject(DataService);
 
   constructor() {
-    this.tournees.set(this.dataService.tournees());
+    this.intializeData();
+  }
+
+  intializeData(): void {
+    this.dataService.isDataLoaded().subscribe(loaded => {
+      if (loaded) {
+        this.commandes.set(this.dataService.commandes());
+        this.equipeLivreurs.set(this.dataService.equipeLivreurs());
+      }
+    });
+    
+
+    this.backendService.getTournees().subscribe((tournees: TourneeDTO[]) => {
+      this.tournees.set(this.backendService.tourneesfromDTO(tournees,this.commandes(),this.equipeLivreurs()));
+    });
+
   }
 
   sortedTournees(): Tournee[] {
     const items = [...this.tournees()];
+    console.log(items.map(t => t.commandes));
     if (!this.sortColumn) {
       return items;
     }

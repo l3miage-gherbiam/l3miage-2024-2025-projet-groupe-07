@@ -6,9 +6,11 @@ import { catchError, Observable, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { EquipeLivreurs } from '../../models/interfaces/schemas/equipe-livreurs.schema';
 import { StatusEquipeLivreurs } from '../../models/enums/status-equipe-livreurs.enum';
-import { Agenda } from '../../models/interfaces/schemas/agenda.schema';
+import { Agenda } from '../../models/interfaces/agenda.model';
 import { map } from 'rxjs/operators';
 import { Commande } from '../../models/interfaces/commande.model';
+import { Tournee } from '../../models/interfaces/tournee.model';
+import { TourneeDTO } from '../../models/interfaces/tournee.model';
 
 // import { TourneeDetailed } from '../../models/tourneeDetailed.model';
 
@@ -78,12 +80,13 @@ export class BackendCommunicationService {
         .map(id => allLivreurs.find(l => l.idEmploye === id))
         .filter((l): l is Livreur => l !== undefined); // Type guard to remove undefined
   
-      return {
+      const equipe: EquipeLivreurs = {
         numEquipe: equipeDTO.numEquipe,
         status: equipeDTO.status as StatusEquipeLivreurs,
         livreurs: livreurs,
         agenda: equipeDTO.agenda
       };
+      return equipe;
     });
   }
 
@@ -137,6 +140,37 @@ export class BackendCommunicationService {
 
   putCommande(commande : Commande) : Observable<any> {
     return this.http.put<Commande>(`http://localhost:8080/api/commandes/${commande.reference}`, commande).pipe(catchError(this.handleError))
+  }
+
+  // Tournee
+
+  getTournees() : Observable<any> {
+    return this.http.get<TourneeDTO>("http://localhost:8080/api/tournee").pipe(catchError(this.handleError))
+  }
+
+  tourneefromDTO(dto: TourneeDTO, allCommandes: Commande[],equipeLivreur: EquipeLivreurs[]): Tournee {
+    const foundEquipe = equipeLivreur.find(e => e.numEquipe === dto.equipeLivreurId)!;
+    const tournee: Tournee = {
+      numTournee: dto.numTournee,
+      date: dto.date,
+      etat: dto.etat,
+      // equipeLivreur: foundEquipe,
+      commandes: dto.commandesIds.map(id => allCommandes.find(c => c.reference === id)!),
+      distanceAParcourir: dto.distanceAParcourir,
+      montant: dto.montant,
+      tempsDeMontageTheorique: dto.tempsDeMontageTheorique,
+      tempsDeMontageEffectif: dto.tempsDeMontageEffectif,
+      camion: dto.camion,
+      planificateur: dto.planificateur
+    };
+    return tournee;
+  }
+  tourneesfromDTO(dto: TourneeDTO[], allCommandes: Commande[],equipeLivreur: EquipeLivreurs[]): Tournee[] {
+    return dto.map(t => this.tourneefromDTO(t, allCommandes,equipeLivreur));
+  }
+
+  postTournee(tournee : any) : Observable<any> {
+    return this.http.post<any>("http://localhost:8080/api/tournee", tournee).pipe(catchError(this.handleError))
   }
 
 

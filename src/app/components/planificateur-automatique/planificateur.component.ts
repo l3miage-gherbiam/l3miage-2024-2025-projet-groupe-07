@@ -16,7 +16,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { DragDropSelectorComponent } from './drag-drop-selector/drag-drop-selector.component';
 import { BackendCommunicationService } from '../../services/backendCommunication.service';
-import { Tournee } from '../../../models/interfaces/tournee.model';
+import { Tournee, TourneeDTO } from '../../../models/interfaces/tournee.model';
+import { EtatTournee } from '../../../models/enums/etat-tournee.enum';
 // import { TourneeDetailed } from '../../../models/tourneeDetailed.model';
 // import { BackendCommunicationService } from '../../services/backendCommunication.service';
 
@@ -69,10 +70,9 @@ export class PlanificateurAutomatiqueComponent {
     this.selectedCommandes.set(selection.commandes);
   }
 
+  // fix numTournee
 
-
-// affichage des commandes non livré uniquement
-  async creerTournees(): Promise<Tournee[]> {
+  async creerTournees(): Promise<void> {
 
     let tournees: Tournee[] = [];
 
@@ -106,10 +106,11 @@ export class PlanificateurAutomatiqueComponent {
     
     console.log('selected equipe',j, this.selectedEquipes()[j]);
     tournees.push({
-      date: new Date("2025-09-01"),
+      date: new Date(2024, 2, 5, 10, 0, 0), // Year, Month (0-11), Day, Hours, Minutes, Seconds
       equipeLivreur: this.selectedEquipes()[j],
       commandes: commandesOrderById.map(commandeId => this.selectedCommandes().find(commande => commande.reference === commandeId)).filter((commande): commande is Commande => commande !== undefined),
-      numTournee: numTournee++
+      numTournee: numTournee++,
+      etat: EtatTournee.EN_ATTENTE
     }
     );
     cheminsOptimise.push(cheminOptimise);
@@ -120,8 +121,22 @@ export class PlanificateurAutomatiqueComponent {
 
   console.log('tournees', tournees);
 
-  return tournees;
-  }
+  for (let tournee of tournees) {
+    let tourneeDTO:TourneeDTO = {
+      numTournee: tournee.numTournee,
+      date: tournee.date,
+      etat: tournee.etat,
+      equipeLivreurId: tournee.equipeLivreur?.numEquipe ? tournee.equipeLivreur.numEquipe : 0,
+      commandesIds: tournee.commandes.map(commande => commande.reference)
+    };
+    console.log('tournee', tourneeDTO);
+  this.backendService.postTournee(tourneeDTO).subscribe(() => {
+    console.log('Tournee créée');
+  });
+  // affecte commendes put (affected = true)
+    }
+
+}
 
 
   
